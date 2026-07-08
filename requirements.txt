@@ -7,5 +7,11 @@ numpy>=1.24
 #       the official selector at https://pytorch.org/get-started/locally/
 ultralytics>=8.4
 
+# M6 — ONNX export and inference
+# NOTE: onnxruntime-gpu includes both CUDAExecutionProvider and CPUExecutionProvider.
+#       Install onnxruntime (CPU-only) if no GPU is available.
+onnx>=1.16
+onnxruntime-gpu>=1.20
+
 # Testing
 pytest>=7.0

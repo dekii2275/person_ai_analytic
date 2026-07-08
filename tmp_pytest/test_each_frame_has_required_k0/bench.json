@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "model": "yolo11n.pt",
+    "device": "cuda",
+    "video": "data/input.mp4",
+    "frames": 3,
+    "warmup_frames": 3,
+    "resolution": "576x1024",
+    "fps": 30.0
+  },
+  "aggregate": {
+    "decode_ms": {
+      "mean_ms": 1.1,
+      "p50_ms": 1.1,
+      "p95_ms": 1.2,
+      "p99_ms": 1.2,
+      "min_ms": 1.0,
+      "max_ms": 1.2
+    },
+    "preprocess_ms": {
+      "mean_ms": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "p99_ms": 0.0,
+      "min_ms": 0.0,
+      "max_ms": 0.0
+    },
+    "inference_ms": {
+      "mean_ms": 20.5,
+      "p50_ms": 20.5,
+      "p95_ms": 21.0,
+      "p99_ms": 21.0,
+      "min_ms": 20.0,
+      "max_ms": 21.0
+    },
+    "postprocess_ms": {
+      "mean_ms": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "p99_ms": 0.0,
+      "min_ms": 0.0,
+      "max_ms": 0.0
+    },
+    "draw_write_ms": {
+      "mean_ms": 2.1,
+      "p50_ms": 2.1,
+      "p95_ms": 2.2,
+      "p99_ms": 2.2,
+      "min_ms": 2.0,
+      "max_ms": 2.2
+    },
+    "total_ms": {
+      "mean_ms": 23.7,
+      "p50_ms": 23.7,
+      "p95_ms": 24.4,
+      "p99_ms": 24.4,
+      "min_ms": 23.0,
+      "max_ms": 24.4
+    }
+  },
+  "processed_frames": 3,
+  "total_wall_time_s": 5.0,
+  "effective_fps": 0.6,
+  "frames": [
+    {
+      "frame_index": 0,
+      "decode_ms": 1.0,
+      "preprocess_ms": 0.0,
+      "inference_ms": 20.0,
+      "postprocess_ms": 0.0,
+      "draw_write_ms": 2.0,
+      "total_ms": 23.0,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 1,
+      "decode_ms": 1.1,
+      "preprocess_ms": 0.0,
+      "inference_ms": 20.5,
+      "postprocess_ms": 0.0,
+      "draw_write_ms": 2.1,
+      "total_ms": 23.7,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 2,
+      "decode_ms": 1.2,
+      "preprocess_ms": 0.0,
+      "inference_ms": 21.0,
+      "postprocess_ms": 0.0,
+      "draw_write_ms": 2.2,
+      "total_ms": 24.4,
+      "n_detections": 2
+    }
+  ]
+}
