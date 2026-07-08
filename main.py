@@ -1,13 +1,17 @@
 """
-main.py — M3 pipeline orchestrator.
+main.py — pipeline orchestrator (M3 + M4).
 
 Reads data/input.mp4, runs YOLO11n person detection on every frame,
 draws bounding boxes, and writes outputs/output.mp4.
 
-Usage:
+Usage (M3 — plain pipeline):
     python main.py
     python main.py --source data/input.mp4 --output outputs/output.mp4
     python main.py --model models/yolo11n.pt --confidence 0.25 --device cuda
+
+Usage (M4 — benchmark):
+    python main.py --benchmark
+    python main.py --benchmark --benchmark-output outputs/benchmark.json
 
 Pipeline:
     VideoSource
@@ -20,7 +24,7 @@ Pipeline:
         ↓
     outputs/output.mp4
 
-No benchmark, no tracking, no ONNX/TRT — M3 scope only.
+No tracking, no ONNX/TRT.
 """
 
 from __future__ import annotations
@@ -32,6 +36,13 @@ import time
 
 import cv2
 
+from src.benchmark import (
+    FrameRecord,
+    StageTimer,
+    aggregate_result,
+    print_summary,
+    save_json,
+)
 from src.detectors.yolov11 import YOLO11Detector
 from src.video_source import VideoSource
 from src.visualization import draw_detections_inplace
@@ -45,6 +56,8 @@ _DEFAULT_OUTPUT = os.path.join("outputs", "output.mp4")
 _DEFAULT_MODEL = os.path.join("models", "yolo11n.pt")
 _DEFAULT_CONFIDENCE = 0.25
 _DEFAULT_DEVICE = None  # auto: cuda if available, else cpu
+_DEFAULT_BENCHMARK_OUTPUT = os.path.join("outputs", "benchmark.json")
+_DEFAULT_WARMUP_FRAMES = 3
 
 # Codec for output MP4 — mp4v is broadly readable on Linux
 _FOURCC = cv2.VideoWriter_fourcc(*"mp4v")
@@ -83,6 +96,23 @@ def _parse_args(argv=None) -> argparse.Namespace:
         "--device",
         default=_DEFAULT_DEVICE,
         help="Torch device, e.g. 'cuda' or 'cpu' (default: auto)",
+    )
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="Run benchmark pipeline (measures per-stage latency)",
+    )
+    parser.add_argument(
+        "--benchmark-output",
+        default=_DEFAULT_BENCHMARK_OUTPUT,
+        dest="benchmark_output",
+        help=f"Benchmark JSON output path (default: {_DEFAULT_BENCHMARK_OUTPUT})",
+    )
+    parser.add_argument(
+        "--warmup",
+        type=int,
+        default=_DEFAULT_WARMUP_FRAMES,
+        help=f"Number of warmup frames excluded from stats (default: {_DEFAULT_WARMUP_FRAMES})",
     )
     return parser.parse_args(argv)
 
@@ -266,13 +296,178 @@ def run(args: argparse.Namespace) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Benchmark pipeline (M4)
+# ---------------------------------------------------------------------------
+
+def run_benchmark(args: argparse.Namespace) -> None:
+    """Run the full pipeline with per-stage latency measurement.
+
+    Stages timed per frame:
+        decode        — cv2 frame read
+        preprocess    — (currently 0 ms: YOLO handles internally)
+        inference     — YOLO11Detector.predict() with CUDA sync
+        postprocess   — (absorbed into inference; reserved for future use)
+        draw_write    — draw_detections_inplace + writer.write
+
+    Warmup frames are processed but excluded from aggregate stats.
+    """
+    import torch  # noqa: PLC0415  (benchmark only; not needed in M3 plain path)
+
+    cuda_available = torch.cuda.is_available()
+
+    print(f"[M4] Source    : {args.source}")
+    print(f"[M4] Output    : {args.output}")
+    print(f"[M4] Benchmark : {args.benchmark_output}")
+    print(f"[M4] Model     : {args.model}")
+    print(f"[M4] Conf      : {args.confidence}")
+    print(f"[M4] Device    : {args.device or 'auto'}")
+    print(f"[M4] Warmup    : {args.warmup} frames (excluded from stats)")
+    print()
+
+    # --- VideoSource -------------------------------------------------------
+    source = VideoSource(args.source)
+    print(
+        f"[M4] Input     : {source.width}x{source.height} "
+        f"@ {source.fps} fps ({source.frame_count} frames)"
+    )
+
+    # --- Detector ----------------------------------------------------------
+    detector = YOLO11Detector(
+        model_path=args.model,
+        confidence=args.confidence,
+        device=args.device,
+    )
+    actual_device = detector.device
+    print(f"[M4] Detector  : {detector}")
+    print()
+
+    # --- VideoWriter -------------------------------------------------------
+    writer = _open_writer(
+        args.output,
+        width=source.width,
+        height=source.height,
+        fps=source.fps,
+    )
+
+    records: list[FrameRecord] = []
+    warmup_done = 0
+    t_wall_start = time.perf_counter()
+
+    try:
+        for frame_index, _ts_ms, frame in source.frames():
+            is_warmup = warmup_done < args.warmup
+
+            # ---- Decode timing: frame is already decoded by VideoSource ----
+            # We measure a no-op "decode" pass here because VideoSource's
+            # generator has already read the frame; a proper decode timer
+            # would require splitting VideoSource internals (out of scope).
+            # Instead we time just the numpy copy to simulate the boundary.
+            with StageTimer(cuda_sync=False) as t_decode:
+                frame_copy = frame.copy()   # isolate from inplace draw
+
+            # ---- Preprocess -----------------------------------------------
+            # YOLO handles all preprocessing internally (resize, normalize).
+            # We record 0.0 as a reserved stage for future explicit work.
+            with StageTimer(cuda_sync=False) as t_pre:
+                pass  # reserved — YOLO internal
+
+            # ---- Inference (CUDA-synchronised) ----------------------------
+            with StageTimer(cuda_sync=cuda_available) as t_infer:
+                detections = detector.predict(frame_copy)
+
+            # ---- Postprocess ----------------------------------------------
+            # Filtering is already done inside predict(); nothing extra here.
+            with StageTimer(cuda_sync=False) as t_post:
+                pass  # reserved
+
+            # ---- Draw + Write ---------------------------------------------
+            with StageTimer(cuda_sync=False) as t_dw:
+                draw_detections_inplace(frame_copy, detections)
+                writer.write(frame_copy)
+
+            total_ms = (
+                t_decode[0] + t_pre[0] + t_infer[0] + t_post[0] + t_dw[0]
+            )
+
+            if is_warmup:
+                warmup_done += 1
+                if frame_index % 1 == 0:
+                    print(f"  [warmup] frame {frame_index}")
+                continue
+
+            records.append(
+                FrameRecord(
+                    frame_index=frame_index,
+                    decode_ms=t_decode[0],
+                    preprocess_ms=t_pre[0],
+                    inference_ms=t_infer[0],
+                    postprocess_ms=t_post[0],
+                    draw_write_ms=t_dw[0],
+                    total_ms=total_ms,
+                    n_detections=len(detections),
+                )
+            )
+
+            if frame_index % 30 == 0:
+                print(
+                    f"  frame {frame_index:4d}/{source.frame_count}  "
+                    f"infer={t_infer[0]:.1f}ms  total={total_ms:.1f}ms  "
+                    f"dets={len(detections)}"
+                )
+
+    finally:
+        writer.release()
+        detector.release()
+        source.release()
+
+    t_wall_end = time.perf_counter()
+    wall_time = t_wall_end - t_wall_start
+
+    # --- Build result ------------------------------------------------------
+    result = aggregate_result(
+        records,
+        model=os.path.basename(args.model),
+        device=actual_device,
+        video=args.source,
+        resolution=f"{source.width}x{source.height}",
+        fps=source.fps,
+        warmup_frames=args.warmup,
+        total_wall_time_s=wall_time,
+    )
+
+    # --- Print summary ------------------------------------------------------
+    print_summary(result)
+
+    # --- Save JSON ----------------------------------------------------------
+    save_json(result, args.benchmark_output)
+    print(f"[M4] Saved benchmark → {args.benchmark_output}")
+
+    # --- Verify output video ------------------------------------------------
+    print(f"[M4] Verifying output video: {args.output} ...")
+    info = verify_output(
+        args.output,
+        expected_width=source.width,
+        expected_height=source.height,
+        expected_fps=source.fps,
+    )
+    print(
+        f"[M4] Output OK — {info['width']}x{info['height']} "
+        f"@ {info['fps']} fps  frames={info['frame_count']}  "
+        f"first_frame_readable={info['first_frame_readable']}"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     args = _parse_args()
     try:
-        summary = run(args)
+        if args.benchmark:
+            run_benchmark(args)
+        else:
+            run(args)
     except Exception as exc:
         print(f"\n[ERROR] {exc}", file=sys.stderr)
         sys.exit(1)
