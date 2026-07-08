@@ -2,5 +2,10 @@
 opencv-python>=4.8
 numpy>=1.24
 
+# M2 — YOLO11n detector
+# NOTE: PyTorch with correct CUDA variant must be installed separately via
+#       the official selector at https://pytorch.org/get-started/locally/
+ultralytics>=8.4
+
 # Testing
 pytest>=7.0
