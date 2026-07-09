@@ -1,0 +1,329 @@
+{
+  "metadata": {
+    "pytorch_model": "models/yolo11n.pt",
+    "onnx_model": "models/yolo11n.onnx",
+    "onnx_provider": "CUDAExecutionProvider",
+    "confidence_threshold": 0.25,
+    "frames": [
+      0,
+      30,
+      60,
+      79,
+      90,
+      120,
+      155,
+      180,
+      196,
+      258
+    ],
+    "source_video": "data/input.mp4"
+  },
+  "summary": {
+    "frames_compared": 10,
+    "matching_detection_count_frames": 10,
+    "total_matched_pairs": 10,
+    "mean_bbox_iou": 0.993142,
+    "min_bbox_iou": 0.967107,
+    "mean_confidence_diff": 0.010665,
+    "max_confidence_diff": 0.066529
+  },
+  "frames": [
+    {
+      "frame_index": 0,
+      "pytorch_count": 1,
+      "onnx_count": 1,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 3431.281,
+      "onnx_inference_ms": 1338.903,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 1.8888672590255737,
+            "y1": 277.0142517089844,
+            "x2": 439.3810729980469,
+            "y2": 1022.6510620117188,
+            "score": 0.9561777114868164,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 1.5648925304412842,
+            "y1": 276.8670959472656,
+            "x2": 439.3839416503906,
+            "y2": 1022.82861328125,
+            "score": 0.9561352729797363,
+            "class_id": 0
+          },
+          "iou": 0.998819,
+          "confidence_diff": 4.2e-05
+        }
+      ]
+    },
+    {
+      "frame_index": 30,
+      "pytorch_count": 1,
+      "onnx_count": 1,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 26.207,
+      "onnx_inference_ms": 25.365,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 129.8049774169922,
+            "y1": 435.6822204589844,
+            "x2": 401.3507385253906,
+            "y2": 1023.3497924804688,
+            "score": 0.9426603317260742,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 129.31265258789062,
+            "y1": 434.162109375,
+            "x2": 401.46868896484375,
+            "y2": 1022.6552734375,
+            "score": 0.9411952495574951,
+            "class_id": 0
+          },
+          "iou": 0.99401,
+          "confidence_diff": 0.001465
+        }
+      ]
+    },
+    {
+      "frame_index": 60,
+      "pytorch_count": 1,
+      "onnx_count": 1,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 13.502,
+      "onnx_inference_ms": 20.972,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 163.599609375,
+            "y1": 414.8932800292969,
+            "x2": 491.3080749511719,
+            "y2": 1021.8195190429688,
+            "score": 0.9554498791694641,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 163.6278076171875,
+            "y1": 414.8999938964844,
+            "x2": 491.34600830078125,
+            "y2": 1021.8577880859375,
+            "score": 0.9557895064353943,
+            "class_id": 0
+          },
+          "iou": 0.999724,
+          "confidence_diff": 0.00034
+        }
+      ]
+    },
+    {
+      "frame_index": 79,
+      "pytorch_count": 0,
+      "onnx_count": 0,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 17.54,
+      "onnx_inference_ms": 23.995,
+      "matches": []
+    },
+    {
+      "frame_index": 90,
+      "pytorch_count": 0,
+      "onnx_count": 0,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 23.906,
+      "onnx_inference_ms": 25.74,
+      "matches": []
+    },
+    {
+      "frame_index": 120,
+      "pytorch_count": 0,
+      "onnx_count": 0,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 16.981,
+      "onnx_inference_ms": 17.901,
+      "matches": []
+    },
+    {
+      "frame_index": 155,
+      "pytorch_count": 2,
+      "onnx_count": 2,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 26.12,
+      "onnx_inference_ms": 22.767,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 198.78330993652344,
+            "y1": 446.4225769042969,
+            "x2": 552.5901489257812,
+            "y2": 1022.1295166015625,
+            "score": 0.925754964351654,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 198.3681182861328,
+            "y1": 446.7250061035156,
+            "x2": 552.6295166015625,
+            "y2": 1022.8193359375,
+            "score": 0.9263898134231567,
+            "class_id": 0
+          },
+          "iou": 0.996998,
+          "confidence_diff": 0.000635
+        },
+        {
+          "pytorch_det": {
+            "x1": 2.075958251953125,
+            "y1": 435.39239501953125,
+            "x2": 63.76499557495117,
+            "y2": 1021.7477416992188,
+            "score": 0.4691454768180847,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 1.6061522960662842,
+            "y1": 431.83563232421875,
+            "x2": 63.845703125,
+            "y2": 1020.8445434570312,
+            "score": 0.40261656045913696,
+            "class_id": 0
+          },
+          "iou": 0.983675,
+          "confidence_diff": 0.066529
+        }
+      ]
+    },
+    {
+      "frame_index": 180,
+      "pytorch_count": 1,
+      "onnx_count": 1,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 12.386,
+      "onnx_inference_ms": 19.558,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 170.166259765625,
+            "y1": 482.4037170410156,
+            "x2": 548.8787841796875,
+            "y2": 1023.0576171875,
+            "score": 0.9425872564315796,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 170.0086212158203,
+            "y1": 482.29119873046875,
+            "x2": 548.6162109375,
+            "y2": 1023.0208129882812,
+            "score": 0.9441011548042297,
+            "class_id": 0
+          },
+          "iou": 0.998615,
+          "confidence_diff": 0.001514
+        }
+      ]
+    },
+    {
+      "frame_index": 196,
+      "pytorch_count": 2,
+      "onnx_count": 2,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 11.851,
+      "onnx_inference_ms": 20.862,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 218.3444366455078,
+            "y1": 434.7064514160156,
+            "x2": 558.1995239257812,
+            "y2": 1022.7371215820312,
+            "score": 0.9364721179008484,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 218.31729125976562,
+            "y1": 434.59893798828125,
+            "x2": 558.8460083007812,
+            "y2": 1022.7259521484375,
+            "score": 0.9374116063117981,
+            "class_id": 0
+          },
+          "iou": 0.99782,
+          "confidence_diff": 0.000939
+        },
+        {
+          "pytorch_det": {
+            "x1": 3.0025696754455566,
+            "y1": 558.5474853515625,
+            "x2": 38.08369064331055,
+            "y2": 967.5623168945312,
+            "score": 0.3347666561603546,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 2.2398438453674316,
+            "y1": 557.8938598632812,
+            "x2": 38.021484375,
+            "y2": 963.9974365234375,
+            "score": 0.36256253719329834,
+            "class_id": 0
+          },
+          "iou": 0.967107,
+          "confidence_diff": 0.027796
+        }
+      ]
+    },
+    {
+      "frame_index": 258,
+      "pytorch_count": 2,
+      "onnx_count": 2,
+      "detection_count_match": true,
+      "pytorch_inference_ms": 14.996,
+      "onnx_inference_ms": 19.707,
+      "matches": [
+        {
+          "pytorch_det": {
+            "x1": 145.00843811035156,
+            "y1": 390.9245300292969,
+            "x2": 314.5033874511719,
+            "y2": 870.2807006835938,
+            "score": 0.901820719242096,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 145.00967407226562,
+            "y1": 390.88067626953125,
+            "x2": 314.54083251953125,
+            "y2": 870.1455078125,
+            "score": 0.9026973843574524,
+            "class_id": 0
+          },
+          "iou": 0.999399,
+          "confidence_diff": 0.000877
+        },
+        {
+          "pytorch_det": {
+            "x1": 312.7121276855469,
+            "y1": 357.77880859375,
+            "x2": 575.0402221679688,
+            "y2": 1021.994140625,
+            "score": 0.9065865278244019,
+            "class_id": 0
+          },
+          "onnx_det": {
+            "x1": 311.82470703125,
+            "y1": 356.93719482421875,
+            "x2": 575.0491333007812,
+            "y2": 1021.9388427734375,
+            "score": 0.9130961298942566,
+            "class_id": 0
+          },
+          "iou": 0.995251,
+          "confidence_diff": 0.00651
+        }
+      ]
+    }
+  ]
+}

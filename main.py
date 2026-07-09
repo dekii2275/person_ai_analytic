@@ -1,5 +1,5 @@
 """
-main.py — pipeline orchestrator (M3 + M4).
+main.py — pipeline orchestrator (M3 + M4 + M8).
 
 Reads data/input.mp4, runs YOLO11n person detection on every frame,
 draws bounding boxes, and writes outputs/output.mp4.
@@ -13,18 +13,24 @@ Usage (M4 — benchmark):
     python main.py --benchmark
     python main.py --benchmark --benchmark-output outputs/benchmark.json
 
+Usage (M8 — tracking):
+    python main.py --tracking
+    python main.py --tracking --tracking-output outputs/tracking_output.mp4
+
 Pipeline:
     VideoSource
         ↓  (frame_index, timestamp_ms, frame)
     YOLO11Detector
         ↓  List[Detection]
-    draw_detections
+    ByteTrackTracker
+        ↓  List[Track]
+    draw_tracks
         ↓  annotated frame
     cv2.VideoWriter
         ↓
-    outputs/output.mp4
+    outputs/tracking_output.mp4
 
-No tracking, no ONNX/TRT.
+No TensorRT, no ONNX inference, no ReID, no multi-camera.
 """
 
 from __future__ import annotations
@@ -44,8 +50,9 @@ from src.benchmark import (
     save_json,
 )
 from src.detectors.yolov11 import YOLO11Detector
+from src.trackers.bytetrack import ByteTrackConfig, ByteTrackTracker
 from src.video_source import VideoSource
-from src.visualization import draw_detections_inplace
+from src.visualization import draw_detections_inplace, draw_tracks_inplace
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -58,6 +65,9 @@ _DEFAULT_CONFIDENCE = 0.25
 _DEFAULT_DEVICE = None  # auto: cuda if available, else cpu
 _DEFAULT_BENCHMARK_OUTPUT = os.path.join("outputs", "benchmark.json")
 _DEFAULT_WARMUP_FRAMES = 3
+_DEFAULT_TRACKING_OUTPUT = os.path.join("outputs", "tracking_output.mp4")
+_DEFAULT_TRACKING_SUMMARY = os.path.join("outputs", "tracking_summary.json")
+_DEFAULT_TRACKING_TRACKS = os.path.join("outputs", "tracking_tracks.json")
 
 # Codec for output MP4 — mp4v is broadly readable on Linux
 _FOURCC = cv2.VideoWriter_fourcc(*"mp4v")
@@ -113,6 +123,29 @@ def _parse_args(argv=None) -> argparse.Namespace:
         type=int,
         default=_DEFAULT_WARMUP_FRAMES,
         help=f"Number of warmup frames excluded from stats (default: {_DEFAULT_WARMUP_FRAMES})",
+    )
+    parser.add_argument(
+        "--tracking",
+        action="store_true",
+        help="Run ByteTrack person tracking pipeline (M8)",
+    )
+    parser.add_argument(
+        "--tracking-output",
+        default=_DEFAULT_TRACKING_OUTPUT,
+        dest="tracking_output",
+        help=f"Tracking video output path (default: {_DEFAULT_TRACKING_OUTPUT})",
+    )
+    parser.add_argument(
+        "--tracking-summary",
+        default=_DEFAULT_TRACKING_SUMMARY,
+        dest="tracking_summary",
+        help=f"Tracking summary JSON path (default: {_DEFAULT_TRACKING_SUMMARY})",
+    )
+    parser.add_argument(
+        "--tracking-tracks",
+        default=_DEFAULT_TRACKING_TRACKS,
+        dest="tracking_tracks",
+        help=f"Per-frame track history JSON path (default: {_DEFAULT_TRACKING_TRACKS})",
     )
     return parser.parse_args(argv)
 
@@ -458,13 +491,216 @@ def run_benchmark(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Tracking pipeline (M8)
+# ---------------------------------------------------------------------------
+
+def run_tracking(args: argparse.Namespace) -> None:
+    """Run the full tracking pipeline with ByteTrack.
+
+    Stages per frame:
+        decode     — frame copy (isolate from draw)
+        detect     — YOLO11Detector.predict()
+        track      — ByteTrackTracker.update()
+        draw_write — draw_tracks_inplace + writer.write
+
+    Outputs:
+        tracking_output.mp4     — annotated video with Track IDs
+        tracking_summary.json   — pipeline statistics
+        tracking_tracks.json    — per-frame track history
+    """
+    import json  # noqa: PLC0415
+
+    print(f"[M8] Source   : {args.source}")
+    print(f"[M8] Output   : {args.tracking_output}")
+    print(f"[M8] Model    : {args.model}")
+    print(f"[M8] Conf     : {args.confidence}")
+    print(f"[M8] Device   : {args.device or 'auto'}")
+    print()
+
+    # --- VideoSource -------------------------------------------------------
+    source = VideoSource(args.source)
+    print(
+        f"[M8] Input    : {source.width}x{source.height} "
+        f"@ {source.fps} fps ({source.frame_count} frames)"
+    )
+
+    # --- Detector ----------------------------------------------------------
+    detector = YOLO11Detector(
+        model_path=args.model,
+        confidence=args.confidence,
+        device=args.device,
+    )
+    print(f"[M8] Detector : {detector}")
+
+    # --- Tracker -----------------------------------------------------------
+    tracker = ByteTrackTracker(
+        config=ByteTrackConfig(frame_rate=int(source.fps))
+    )
+    print(f"[M8] Tracker  : {tracker}")
+    print()
+
+    # --- VideoWriter -------------------------------------------------------
+    writer = _open_writer(
+        args.tracking_output,
+        width=source.width,
+        height=source.height,
+        fps=source.fps,
+    )
+
+    # --- Timing accumulators -----------------------------------------------
+    detect_times: list[float] = []
+    track_times: list[float] = []
+    draw_write_times: list[float] = []
+
+    # --- Tracking statistics -----------------------------------------------
+    all_track_ids: set[int] = set()
+    active_counts: list[int] = []
+    track_history: list[dict] = []
+
+    t_wall_start = time.perf_counter()
+
+    try:
+        for frame_index, _ts_ms, frame in source.frames():
+            frame_copy = frame.copy()
+
+            # ---- Detect ---------------------------------------------------
+            t0 = time.perf_counter()
+            detections = detector.predict(frame_copy)
+            detect_times.append((time.perf_counter() - t0) * 1000)
+
+            # ---- Track ----------------------------------------------------
+            t1 = time.perf_counter()
+            tracks = tracker.update(detections=detections, frame=frame_copy)
+            track_times.append((time.perf_counter() - t1) * 1000)
+
+            # ---- Collect stats --------------------------------------------
+            for t in tracks:
+                all_track_ids.add(t.track_id)
+            active_counts.append(len(tracks))
+
+            # Per-frame history (compact)
+            track_history.append({
+                "frame_index": frame_index,
+                "tracks": [
+                    {
+                        "track_id": t.track_id,
+                        "bbox": [round(t.x1, 1), round(t.y1, 1),
+                                 round(t.x2, 1), round(t.y2, 1)],
+                        "score": round(t.score, 4),
+                    }
+                    for t in tracks
+                ],
+            })
+
+            # ---- Draw + Write --------------------------------------------
+            t2 = time.perf_counter()
+            draw_tracks_inplace(frame_copy, tracks)
+            writer.write(frame_copy)
+            draw_write_times.append((time.perf_counter() - t2) * 1000)
+
+            # Progress every 30 frames
+            if frame_index % 30 == 0:
+                elapsed = time.perf_counter() - t_wall_start
+                print(
+                    f"  frame {frame_index:4d}/{source.frame_count}  "
+                    f"dets={len(detections)}  tracks={len(tracks)}  "
+                    f"elapsed={elapsed:.1f}s"
+                )
+
+    finally:
+        writer.release()
+        detector.release()
+        tracker.reset()
+        source.release()
+
+    t_wall_end = time.perf_counter()
+    wall_time = t_wall_end - t_wall_start
+    processed = len(active_counts)
+
+    # --- Build summary -------------------------------------------------------
+    def _stats(ms_list: list[float]) -> dict:
+        if not ms_list:
+            return {}
+        arr = sorted(ms_list)
+        n = len(arr)
+        return {
+            "mean_ms": round(sum(arr) / n, 4),
+            "p50_ms":  round(arr[int(n * 0.50)], 4),
+            "p95_ms":  round(arr[int(n * 0.95)], 4),
+            "p99_ms":  round(arr[min(int(n * 0.99), n - 1)], 4),
+        }
+
+    summary = {
+        "metadata": {
+            "video":    args.source,
+            "detector": "YOLO11n PyTorch",
+            "tracker":  "ByteTrack",
+            "confidence_threshold": args.confidence,
+        },
+        "summary": {
+            "processed_frames":     processed,
+            "total_unique_track_ids": len(all_track_ids),
+            "max_concurrent_tracks": max(active_counts) if active_counts else 0,
+            "mean_active_tracks":   round(sum(active_counts) / max(processed, 1), 4),
+            "effective_fps":        round(processed / max(wall_time, 1e-6), 4),
+            "total_wall_time_s":    round(wall_time, 4),
+        },
+        "latency": {
+            "detect":     _stats(detect_times),
+            "tracker_update": _stats(track_times),
+            "draw_write": _stats(draw_write_times),
+        },
+    }
+
+    # --- Print summary -------------------------------------------------------
+    print()
+    print("[M8] " + "=" * 50)
+    print(f"[M8] Processed frames    : {processed}")
+    print(f"[M8] Unique track IDs    : {len(all_track_ids)}")
+    print(f"[M8] Max concurrent      : {summary['summary']['max_concurrent_tracks']}")
+    print(f"[M8] Mean active tracks  : {summary['summary']['mean_active_tracks']:.2f}")
+    print(f"[M8] Effective FPS       : {summary['summary']['effective_fps']:.2f}")
+    if track_times:
+        print(f"[M8] Tracker mean latency: {_stats(track_times)['mean_ms']:.3f} ms")
+        print(f"[M8] Tracker p95 latency : {_stats(track_times)['p95_ms']:.3f} ms")
+    print("[M8] " + "=" * 50)
+
+    # --- Save JSONs ----------------------------------------------------------
+    os.makedirs(os.path.dirname(args.tracking_summary) or ".", exist_ok=True)
+    with open(args.tracking_summary, "w") as f:
+        json.dump(summary, f, indent=2)
+    print(f"[M8] Summary  → {args.tracking_summary}")
+
+    os.makedirs(os.path.dirname(args.tracking_tracks) or ".", exist_ok=True)
+    with open(args.tracking_tracks, "w") as f:
+        json.dump(track_history, f, indent=2)
+    print(f"[M8] Tracks   → {args.tracking_tracks}")
+
+    # --- Verify output video -----------------------------------------------
+    print(f"\n[M8] Verifying output: {args.tracking_output} ...")
+    info = verify_output(
+        args.tracking_output,
+        expected_width=source.width,
+        expected_height=source.height,
+        expected_fps=source.fps,
+    )
+    print(
+        f"[M8] Output OK — {info['width']}x{info['height']} "
+        f"@ {info['fps']} fps  frames={info['frame_count']}  "
+        f"first_frame_readable={info['first_frame_readable']}"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     args = _parse_args()
     try:
-        if args.benchmark:
+        if args.tracking:
+            run_tracking(args)
+        elif args.benchmark:
             run_benchmark(args)
         else:
             run(args)

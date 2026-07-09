@@ -1,0 +1,2626 @@
+{
+  "metadata": {
+    "model": "yolo11n.pt",
+    "device": "cuda",
+    "video": "data\\input.mp4",
+    "frames": 256,
+    "warmup_frames": 3,
+    "resolution": "576x1024",
+    "fps": 30.0
+  },
+  "aggregate": {
+    "decode_ms": {
+      "mean_ms": 0.4246,
+      "p50_ms": 0.3824,
+      "p95_ms": 0.6045,
+      "p99_ms": 0.7557,
+      "min_ms": 0.3186,
+      "max_ms": 0.8777
+    },
+    "preprocess_ms": {
+      "mean_ms": 0.0006,
+      "p50_ms": 0.0005,
+      "p95_ms": 0.001,
+      "p99_ms": 0.0013,
+      "min_ms": 0.0002,
+      "max_ms": 0.0042
+    },
+    "inference_ms": {
+      "mean_ms": 10.7833,
+      "p50_ms": 9.8718,
+      "p95_ms": 15.7145,
+      "p99_ms": 18.0145,
+      "min_ms": 7.9705,
+      "max_ms": 18.1706
+    },
+    "postprocess_ms": {
+      "mean_ms": 0.0006,
+      "p50_ms": 0.0005,
+      "p95_ms": 0.0008,
+      "p99_ms": 0.0012,
+      "min_ms": 0.0003,
+      "max_ms": 0.0128
+    },
+    "draw_write_ms": {
+      "mean_ms": 2.6165,
+      "p50_ms": 2.5578,
+      "p95_ms": 3.1608,
+      "p99_ms": 3.5731,
+      "min_ms": 1.8978,
+      "max_ms": 4.9669
+    },
+    "total_ms": {
+      "mean_ms": 13.8256,
+      "p50_ms": 12.9,
+      "p95_ms": 18.6443,
+      "p99_ms": 21.0002,
+      "min_ms": 10.5545,
+      "max_ms": 21.8934
+    }
+  },
+  "processed_frames": 256,
+  "total_wall_time_s": 5.7409,
+  "effective_fps": 44.5925,
+  "frames": [
+    {
+      "frame_index": 3,
+      "decode_ms": 0.6693,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.4115,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5627,
+      "total_ms": 12.6444,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 4,
+      "decode_ms": 0.3241,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.541,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.0649,
+      "total_ms": 15.9311,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 5,
+      "decode_ms": 0.5371,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 11.2637,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3697,
+      "total_ms": 14.1718,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 6,
+      "decode_ms": 0.5324,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.4669,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.6443,
+      "total_ms": 12.6449,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 7,
+      "decode_ms": 0.8099,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 10.474,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2913,
+      "total_ms": 13.5763,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 8,
+      "decode_ms": 0.4725,
+      "preprocess_ms": 0.0042,
+      "inference_ms": 9.1318,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7919,
+      "total_ms": 12.4008,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 9,
+      "decode_ms": 0.3729,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.5169,
+      "postprocess_ms": 0.001,
+      "draw_write_ms": 2.4944,
+      "total_ms": 13.3856,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 10,
+      "decode_ms": 0.3566,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 17.7673,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.989,
+      "total_ms": 21.1141,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 11,
+      "decode_ms": 0.4908,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 17.2224,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.4759,
+      "total_ms": 20.1905,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 12,
+      "decode_ms": 0.3896,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 18.0145,
+      "postprocess_ms": 0.0021,
+      "draw_write_ms": 2.4578,
+      "total_ms": 20.8645,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 13,
+      "decode_ms": 0.3733,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.2189,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.3373,
+      "total_ms": 12.9305,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 14,
+      "decode_ms": 0.3511,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.3213,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.7092,
+      "total_ms": 12.3828,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 15,
+      "decode_ms": 0.3434,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.8722,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5118,
+      "total_ms": 12.7283,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 16,
+      "decode_ms": 0.3494,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.6704,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5504,
+      "total_ms": 12.5712,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 17,
+      "decode_ms": 0.3394,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.6883,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4433,
+      "total_ms": 12.4718,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 18,
+      "decode_ms": 0.4515,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.0334,
+      "postprocess_ms": 0.0003,
+      "draw_write_ms": 2.2955,
+      "total_ms": 11.7812,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 19,
+      "decode_ms": 0.3448,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3066,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4113,
+      "total_ms": 12.0637,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 20,
+      "decode_ms": 0.3506,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 11.8664,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6815,
+      "total_ms": 14.8995,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 21,
+      "decode_ms": 0.3447,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.7656,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4786,
+      "total_ms": 12.5897,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 22,
+      "decode_ms": 0.3529,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.2967,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2675,
+      "total_ms": 13.918,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 23,
+      "decode_ms": 0.3466,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.2542,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3322,
+      "total_ms": 11.9343,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 24,
+      "decode_ms": 0.3327,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.9942,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.184,
+      "total_ms": 12.5121,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 25,
+      "decode_ms": 0.3427,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.7025,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2089,
+      "total_ms": 12.2551,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 26,
+      "decode_ms": 0.3342,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 8.9043,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.7436,
+      "total_ms": 11.983,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 27,
+      "decode_ms": 0.3494,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.1199,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4233,
+      "total_ms": 11.8937,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 28,
+      "decode_ms": 0.381,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.2314,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3604,
+      "total_ms": 11.9738,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 29,
+      "decode_ms": 0.3439,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.8639,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2805,
+      "total_ms": 13.4892,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 30,
+      "decode_ms": 0.3823,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.3099,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2049,
+      "total_ms": 11.8983,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 31,
+      "decode_ms": 0.3294,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 13.3264,
+      "postprocess_ms": 0.0021,
+      "draw_write_ms": 2.9741,
+      "total_ms": 16.6325,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 32,
+      "decode_ms": 0.3527,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3309,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4803,
+      "total_ms": 12.1649,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 33,
+      "decode_ms": 0.3465,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 11.8164,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2627,
+      "total_ms": 14.4265,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 34,
+      "decode_ms": 0.3795,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.0181,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.3843,
+      "total_ms": 12.7831,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 35,
+      "decode_ms": 0.381,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.383,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2144,
+      "total_ms": 13.9795,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 36,
+      "decode_ms": 0.459,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.3642,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3661,
+      "total_ms": 15.1904,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 37,
+      "decode_ms": 0.3494,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 9.0221,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.4133,
+      "total_ms": 11.7863,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 38,
+      "decode_ms": 0.3724,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.5283,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.2861,
+      "total_ms": 12.1881,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 39,
+      "decode_ms": 0.4254,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.3531,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2137,
+      "total_ms": 13.9933,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 40,
+      "decode_ms": 0.3639,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.5709,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.3631,
+      "total_ms": 12.2991,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 41,
+      "decode_ms": 0.3642,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 9.8855,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.2617,
+      "total_ms": 12.5129,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 42,
+      "decode_ms": 0.3859,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.2649,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.3184,
+      "total_ms": 13.9702,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 43,
+      "decode_ms": 0.4549,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.8475,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4135,
+      "total_ms": 14.7168,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 44,
+      "decode_ms": 0.3407,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 10.611,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.304,
+      "total_ms": 13.2569,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 45,
+      "decode_ms": 0.3792,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0804,
+      "postprocess_ms": 0.0003,
+      "draw_write_ms": 2.4524,
+      "total_ms": 11.9126,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 46,
+      "decode_ms": 0.3603,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.1921,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4177,
+      "total_ms": 11.9712,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 47,
+      "decode_ms": 0.3797,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 8.8337,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3571,
+      "total_ms": 11.5716,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 48,
+      "decode_ms": 0.5491,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.5663,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4033,
+      "total_ms": 12.5198,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 49,
+      "decode_ms": 0.3475,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.8286,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.3487,
+      "total_ms": 12.5256,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 50,
+      "decode_ms": 0.355,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 15.6496,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5488,
+      "total_ms": 18.5542,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 51,
+      "decode_ms": 0.3572,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 10.1146,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3746,
+      "total_ms": 12.8477,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 52,
+      "decode_ms": 0.3515,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.612,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.3213,
+      "total_ms": 12.2859,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 53,
+      "decode_ms": 0.6301,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.7557,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3647,
+      "total_ms": 15.7517,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 54,
+      "decode_ms": 0.3717,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0427,
+      "postprocess_ms": 0.001,
+      "draw_write_ms": 2.4764,
+      "total_ms": 11.8921,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 55,
+      "decode_ms": 0.6197,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 8.849,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2868,
+      "total_ms": 11.7565,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 56,
+      "decode_ms": 0.3735,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.464,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2266,
+      "total_ms": 12.0649,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 57,
+      "decode_ms": 0.3824,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3545,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.2791,
+      "total_ms": 12.0173,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 58,
+      "decode_ms": 0.366,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.3408,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3816,
+      "total_ms": 14.0896,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 59,
+      "decode_ms": 0.351,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.5082,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.8783,
+      "total_ms": 12.7386,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 60,
+      "decode_ms": 0.369,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.1894,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.1588,
+      "total_ms": 13.7181,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 61,
+      "decode_ms": 0.3554,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 13.2577,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.5148,
+      "total_ms": 16.1288,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 62,
+      "decode_ms": 0.3518,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.6328,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4174,
+      "total_ms": 12.403,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 63,
+      "decode_ms": 0.3546,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 16.9491,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.5693,
+      "total_ms": 19.8741,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 64,
+      "decode_ms": 0.5014,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 16.9463,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2052,
+      "total_ms": 19.6538,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 65,
+      "decode_ms": 0.3678,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.8929,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2529,
+      "total_ms": 12.5147,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 66,
+      "decode_ms": 0.3546,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 13.0062,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3033,
+      "total_ms": 15.6649,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 67,
+      "decode_ms": 0.3595,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.6078,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2416,
+      "total_ms": 12.2096,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 68,
+      "decode_ms": 0.3513,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.3738,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2563,
+      "total_ms": 11.9824,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 69,
+      "decode_ms": 0.3806,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.0384,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9306,
+      "total_ms": 12.3505,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 70,
+      "decode_ms": 0.3515,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.2305,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3846,
+      "total_ms": 11.9678,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 71,
+      "decode_ms": 0.3872,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.3647,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4787,
+      "total_ms": 12.2314,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 72,
+      "decode_ms": 0.4498,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 10.2279,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.1544,
+      "total_ms": 12.8336,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 73,
+      "decode_ms": 0.4395,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 8.9622,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.4267,
+      "total_ms": 11.8294,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 74,
+      "decode_ms": 0.3508,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.6749,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5598,
+      "total_ms": 12.5865,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 75,
+      "decode_ms": 0.3786,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.6298,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.4017,
+      "total_ms": 12.4111,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 76,
+      "decode_ms": 0.36,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.83,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4609,
+      "total_ms": 12.6519,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 77,
+      "decode_ms": 0.401,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.8718,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6552,
+      "total_ms": 12.9289,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 78,
+      "decode_ms": 0.3689,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 18.1706,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.3531,
+      "total_ms": 21.8934,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 79,
+      "decode_ms": 0.3613,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 7.9705,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4409,
+      "total_ms": 10.774,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 80,
+      "decode_ms": 0.5742,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.0532,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3815,
+      "total_ms": 12.0099,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 81,
+      "decode_ms": 0.5834,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.6756,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5919,
+      "total_ms": 12.8519,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 82,
+      "decode_ms": 0.4104,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.6036,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4053,
+      "total_ms": 15.4204,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 83,
+      "decode_ms": 0.5059,
+      "preprocess_ms": 0.0013,
+      "inference_ms": 8.2618,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.258,
+      "total_ms": 11.0274,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 84,
+      "decode_ms": 0.3487,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 8.307,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 1.8978,
+      "total_ms": 10.5545,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 85,
+      "decode_ms": 0.5664,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.3879,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2703,
+      "total_ms": 13.2255,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 86,
+      "decode_ms": 0.3816,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 10.5095,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.3126,
+      "total_ms": 13.2053,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 87,
+      "decode_ms": 0.3689,
+      "preprocess_ms": 0.0002,
+      "inference_ms": 9.1175,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.481,
+      "total_ms": 11.968,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 88,
+      "decode_ms": 0.3904,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.4556,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 3.5731,
+      "total_ms": 13.4201,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 89,
+      "decode_ms": 0.3773,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 12.1369,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5228,
+      "total_ms": 15.0379,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 90,
+      "decode_ms": 0.3971,
+      "preprocess_ms": 0.001,
+      "inference_ms": 11.6208,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4517,
+      "total_ms": 14.471,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 91,
+      "decode_ms": 0.3552,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 10.3739,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7512,
+      "total_ms": 13.4817,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 92,
+      "decode_ms": 0.5728,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 10.1858,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5094,
+      "total_ms": 13.269,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 93,
+      "decode_ms": 0.3835,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 10.8093,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3819,
+      "total_ms": 13.5759,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 94,
+      "decode_ms": 0.3568,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 10.5783,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6456,
+      "total_ms": 13.5815,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 95,
+      "decode_ms": 0.3575,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.9387,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4842,
+      "total_ms": 12.7813,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 96,
+      "decode_ms": 0.3846,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 8.5151,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.0953,
+      "total_ms": 10.9966,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 97,
+      "decode_ms": 0.3499,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.3272,
+      "postprocess_ms": 0.0003,
+      "draw_write_ms": 2.8317,
+      "total_ms": 12.5098,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 98,
+      "decode_ms": 0.345,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 8.1766,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4301,
+      "total_ms": 10.9525,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 99,
+      "decode_ms": 0.3602,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 8.9092,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5093,
+      "total_ms": 11.7797,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 100,
+      "decode_ms": 0.3605,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 13.5585,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2983,
+      "total_ms": 16.2186,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 101,
+      "decode_ms": 0.3885,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 11.4994,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.7709,
+      "total_ms": 14.6599,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 102,
+      "decode_ms": 0.3839,
+      "preprocess_ms": 0.0013,
+      "inference_ms": 14.8851,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.6308,
+      "total_ms": 17.9018,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 103,
+      "decode_ms": 0.3985,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 8.6992,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5767,
+      "total_ms": 11.6758,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 104,
+      "decode_ms": 0.3781,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 8.1872,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4185,
+      "total_ms": 10.9847,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 105,
+      "decode_ms": 0.4653,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.2764,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.9436,
+      "total_ms": 14.6864,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 106,
+      "decode_ms": 0.3825,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.0612,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6407,
+      "total_ms": 13.0854,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 107,
+      "decode_ms": 0.4589,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 9.4137,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.8953,
+      "total_ms": 12.7694,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 108,
+      "decode_ms": 0.7221,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.0622,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2648,
+      "total_ms": 12.0503,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 109,
+      "decode_ms": 0.3505,
+      "preprocess_ms": 0.0002,
+      "inference_ms": 13.8363,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7962,
+      "total_ms": 16.9836,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 110,
+      "decode_ms": 0.4276,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.06,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.8693,
+      "total_ms": 12.3582,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 111,
+      "decode_ms": 0.3707,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.584,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 3.0026,
+      "total_ms": 12.9584,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 112,
+      "decode_ms": 0.3631,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.622,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.8631,
+      "total_ms": 14.8492,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 113,
+      "decode_ms": 0.5244,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 8.8712,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.732,
+      "total_ms": 12.1285,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 114,
+      "decode_ms": 0.7557,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 9.4155,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.8708,
+      "total_ms": 13.0436,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 115,
+      "decode_ms": 0.3857,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.5751,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6771,
+      "total_ms": 12.639,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 116,
+      "decode_ms": 0.3851,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.9899,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6384,
+      "total_ms": 16.0143,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 117,
+      "decode_ms": 0.5488,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.003,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.5411,
+      "total_ms": 12.0942,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 118,
+      "decode_ms": 0.3688,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.4666,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.3563,
+      "total_ms": 12.1928,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 119,
+      "decode_ms": 0.3788,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.2813,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 4.9669,
+      "total_ms": 14.6278,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 120,
+      "decode_ms": 0.3604,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 12.7108,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.1468,
+      "total_ms": 15.2192,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 121,
+      "decode_ms": 0.3545,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 8.3385,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5289,
+      "total_ms": 11.2232,
+      "n_detections": 0
+    },
+    {
+      "frame_index": 122,
+      "decode_ms": 0.3802,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 11.8096,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 3.1118,
+      "total_ms": 15.3029,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 123,
+      "decode_ms": 0.7131,
+      "preprocess_ms": 0.0018,
+      "inference_ms": 10.6302,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.762,
+      "total_ms": 14.1077,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 124,
+      "decode_ms": 0.5327,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.0101,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.7514,
+      "total_ms": 12.2957,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 125,
+      "decode_ms": 0.3541,
+      "preprocess_ms": 0.0011,
+      "inference_ms": 17.4694,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.1752,
+      "total_ms": 21.0002,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 126,
+      "decode_ms": 0.3771,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.0047,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 3.0274,
+      "total_ms": 12.4104,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 127,
+      "decode_ms": 0.4424,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.9419,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7039,
+      "total_ms": 16.0892,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 128,
+      "decode_ms": 0.3631,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.8824,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7134,
+      "total_ms": 12.96,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 129,
+      "decode_ms": 0.3658,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0715,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 3.32,
+      "total_ms": 12.7583,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 130,
+      "decode_ms": 0.3444,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.4603,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9602,
+      "total_ms": 12.7659,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 131,
+      "decode_ms": 0.3549,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.4151,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 3.0102,
+      "total_ms": 12.7811,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 132,
+      "decode_ms": 0.4824,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.2782,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2338,
+      "total_ms": 11.9951,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 133,
+      "decode_ms": 0.3819,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 9.4496,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9986,
+      "total_ms": 12.8313,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 134,
+      "decode_ms": 0.388,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 16.2907,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7692,
+      "total_ms": 19.4486,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 135,
+      "decode_ms": 0.3912,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 9.3953,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7167,
+      "total_ms": 12.5045,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 136,
+      "decode_ms": 0.4727,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.8448,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.8651,
+      "total_ms": 14.1837,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 137,
+      "decode_ms": 0.3889,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.3927,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.9896,
+      "total_ms": 12.7721,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 138,
+      "decode_ms": 0.3496,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 10.7773,
+      "postprocess_ms": 0.0012,
+      "draw_write_ms": 3.7823,
+      "total_ms": 14.9107,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 139,
+      "decode_ms": 0.3564,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.666,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9039,
+      "total_ms": 12.927,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 140,
+      "decode_ms": 0.6749,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 9.003,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.6365,
+      "total_ms": 12.3156,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 141,
+      "decode_ms": 0.5245,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 8.7889,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9524,
+      "total_ms": 12.2666,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 142,
+      "decode_ms": 0.4371,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 8.9854,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.553,
+      "total_ms": 11.9766,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 143,
+      "decode_ms": 0.4523,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 14.9483,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.5911,
+      "total_ms": 17.9927,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 144,
+      "decode_ms": 0.5586,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.4743,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.0844,
+      "total_ms": 12.1182,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 145,
+      "decode_ms": 0.593,
+      "preprocess_ms": 0.001,
+      "inference_ms": 8.746,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.9429,
+      "total_ms": 12.2837,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 146,
+      "decode_ms": 0.6045,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3425,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.8959,
+      "total_ms": 12.844,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 147,
+      "decode_ms": 0.3992,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3242,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7228,
+      "total_ms": 12.4472,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 148,
+      "decode_ms": 0.3871,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.062,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.1043,
+      "total_ms": 15.5544,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 149,
+      "decode_ms": 0.3758,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 8.8139,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7817,
+      "total_ms": 11.9727,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 150,
+      "decode_ms": 0.3743,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.3822,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.6556,
+      "total_ms": 12.4131,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 151,
+      "decode_ms": 0.4066,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 8.9745,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.458,
+      "total_ms": 11.84,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 152,
+      "decode_ms": 0.3615,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 16.7265,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.851,
+      "total_ms": 19.9402,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 153,
+      "decode_ms": 0.4876,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.1844,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6506,
+      "total_ms": 15.3235,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 154,
+      "decode_ms": 0.4056,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 17.5929,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7241,
+      "total_ms": 20.7235,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 155,
+      "decode_ms": 0.3739,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.2835,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.6703,
+      "total_ms": 12.3289,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 156,
+      "decode_ms": 0.8777,
+      "preprocess_ms": 0.0013,
+      "inference_ms": 9.9572,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.0949,
+      "total_ms": 12.9315,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 157,
+      "decode_ms": 0.5451,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 8.5921,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.4364,
+      "total_ms": 11.5748,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 158,
+      "decode_ms": 0.4284,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.9277,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4413,
+      "total_ms": 14.7982,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 159,
+      "decode_ms": 0.4812,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.7874,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6847,
+      "total_ms": 15.9543,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 160,
+      "decode_ms": 0.592,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 8.8722,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4876,
+      "total_ms": 11.953,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 161,
+      "decode_ms": 0.5083,
+      "preprocess_ms": 0.001,
+      "inference_ms": 12.4369,
+      "postprocess_ms": 0.0128,
+      "draw_write_ms": 2.6344,
+      "total_ms": 15.5934,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 162,
+      "decode_ms": 0.3907,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.6356,
+      "postprocess_ms": 0.0003,
+      "draw_write_ms": 2.8232,
+      "total_ms": 15.8504,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 163,
+      "decode_ms": 0.4194,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 8.6584,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6116,
+      "total_ms": 11.6906,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 164,
+      "decode_ms": 0.5243,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 15.7145,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4047,
+      "total_ms": 18.6443,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 165,
+      "decode_ms": 0.5111,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.8871,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6086,
+      "total_ms": 13.0077,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 166,
+      "decode_ms": 0.4039,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.3315,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.574,
+      "total_ms": 12.3104,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 167,
+      "decode_ms": 0.3986,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 14.6468,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4372,
+      "total_ms": 17.4836,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 168,
+      "decode_ms": 0.4074,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.9938,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2643,
+      "total_ms": 14.6665,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 169,
+      "decode_ms": 0.3554,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 10.7913,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 3.0106,
+      "total_ms": 14.1587,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 170,
+      "decode_ms": 0.6339,
+      "preprocess_ms": 0.0013,
+      "inference_ms": 15.0398,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.8413,
+      "total_ms": 18.5167,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 171,
+      "decode_ms": 0.5015,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.1569,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 3.2034,
+      "total_ms": 14.863,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 172,
+      "decode_ms": 0.5351,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.65,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5006,
+      "total_ms": 15.6867,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 173,
+      "decode_ms": 0.4464,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.6853,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.8792,
+      "total_ms": 13.0123,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 174,
+      "decode_ms": 0.4792,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.7126,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7073,
+      "total_ms": 12.9,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 175,
+      "decode_ms": 0.4344,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.7035,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.8188,
+      "total_ms": 13.9575,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 176,
+      "decode_ms": 0.4259,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 10.3895,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.2997,
+      "total_ms": 14.1162,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 177,
+      "decode_ms": 0.7521,
+      "preprocess_ms": 0.002,
+      "inference_ms": 13.0555,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.8241,
+      "total_ms": 16.6342,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 178,
+      "decode_ms": 0.5636,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 11.6,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6712,
+      "total_ms": 14.8356,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 179,
+      "decode_ms": 0.4964,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.8003,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9688,
+      "total_ms": 13.2664,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 180,
+      "decode_ms": 0.4125,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.8014,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.2926,
+      "total_ms": 12.5075,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 181,
+      "decode_ms": 0.4755,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 12.998,
+      "postprocess_ms": 0.0011,
+      "draw_write_ms": 3.4694,
+      "total_ms": 16.9445,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 182,
+      "decode_ms": 0.5373,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 12.0812,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.8521,
+      "total_ms": 15.4714,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 183,
+      "decode_ms": 0.5786,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 13.5058,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7664,
+      "total_ms": 16.8521,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 184,
+      "decode_ms": 0.3709,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 13.0112,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7067,
+      "total_ms": 16.09,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 185,
+      "decode_ms": 0.3938,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 12.6376,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5779,
+      "total_ms": 15.6101,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 186,
+      "decode_ms": 0.367,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 8.8118,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5174,
+      "total_ms": 11.6969,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 187,
+      "decode_ms": 0.3549,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.1029,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.6541,
+      "total_ms": 12.1132,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 188,
+      "decode_ms": 0.3666,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 8.923,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6859,
+      "total_ms": 11.9763,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 189,
+      "decode_ms": 0.4085,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.3387,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4075,
+      "total_ms": 13.1557,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 190,
+      "decode_ms": 0.6613,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 9.553,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.3765,
+      "total_ms": 12.5919,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 191,
+      "decode_ms": 0.3577,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 10.3032,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.295,
+      "total_ms": 12.9571,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 192,
+      "decode_ms": 0.5047,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.0794,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.0419,
+      "total_ms": 12.6269,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 193,
+      "decode_ms": 0.5312,
+      "preprocess_ms": 0.001,
+      "inference_ms": 9.4663,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.362,
+      "total_ms": 12.361,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 194,
+      "decode_ms": 0.4973,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.1809,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.3398,
+      "total_ms": 12.019,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 195,
+      "decode_ms": 0.4131,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.1444,
+      "postprocess_ms": 0.0003,
+      "draw_write_ms": 2.3653,
+      "total_ms": 11.9235,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 196,
+      "decode_ms": 0.4905,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 13.066,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4974,
+      "total_ms": 16.0546,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 197,
+      "decode_ms": 0.349,
+      "preprocess_ms": 0.0011,
+      "inference_ms": 10.9772,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5662,
+      "total_ms": 13.8939,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 198,
+      "decode_ms": 0.3948,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.9208,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.591,
+      "total_ms": 12.9075,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 199,
+      "decode_ms": 0.5067,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.8887,
+      "postprocess_ms": 0.0007,
+      "draw_write_ms": 2.6942,
+      "total_ms": 13.0907,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 200,
+      "decode_ms": 0.3596,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.6034,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5249,
+      "total_ms": 12.4887,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 201,
+      "decode_ms": 0.4035,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 12.8872,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4411,
+      "total_ms": 15.7326,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 202,
+      "decode_ms": 0.3629,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.6595,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5032,
+      "total_ms": 13.5266,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 203,
+      "decode_ms": 0.522,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 12.2151,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7482,
+      "total_ms": 15.4862,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 204,
+      "decode_ms": 0.3688,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 16.2262,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4824,
+      "total_ms": 19.0784,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 205,
+      "decode_ms": 0.3186,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.8877,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5494,
+      "total_ms": 12.7565,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 206,
+      "decode_ms": 0.5108,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.4538,
+      "postprocess_ms": 0.0008,
+      "draw_write_ms": 2.5703,
+      "total_ms": 12.5362,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 207,
+      "decode_ms": 0.3742,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0807,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7635,
+      "total_ms": 12.2192,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 208,
+      "decode_ms": 0.4006,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 12.84,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4661,
+      "total_ms": 15.7076,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 209,
+      "decode_ms": 0.5135,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.481,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.6831,
+      "total_ms": 12.6785,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 210,
+      "decode_ms": 0.3687,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 11.8537,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4582,
+      "total_ms": 14.6813,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 211,
+      "decode_ms": 0.3825,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.0866,
+      "postprocess_ms": 0.001,
+      "draw_write_ms": 2.5444,
+      "total_ms": 12.0149,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 212,
+      "decode_ms": 0.3925,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 18.0696,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4978,
+      "total_ms": 20.9608,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 213,
+      "decode_ms": 0.5712,
+      "preprocess_ms": 0.0007,
+      "inference_ms": 12.4175,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7041,
+      "total_ms": 15.6939,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 214,
+      "decode_ms": 0.3704,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.8499,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4059,
+      "total_ms": 13.6272,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 215,
+      "decode_ms": 0.5212,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 11.008,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.4755,
+      "total_ms": 14.0056,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 216,
+      "decode_ms": 0.4274,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.3726,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4071,
+      "total_ms": 12.2081,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 217,
+      "decode_ms": 0.4089,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.153,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5213,
+      "total_ms": 12.084,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 218,
+      "decode_ms": 0.385,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.0718,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.8558,
+      "total_ms": 12.3134,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 219,
+      "decode_ms": 0.4153,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.7702,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.745,
+      "total_ms": 13.9313,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 220,
+      "decode_ms": 0.4071,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.4318,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.086,
+      "total_ms": 12.9257,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 221,
+      "decode_ms": 0.3666,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0578,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.0789,
+      "total_ms": 12.5041,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 222,
+      "decode_ms": 0.3668,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 9.2138,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5681,
+      "total_ms": 12.1496,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 223,
+      "decode_ms": 0.4167,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.0515,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5169,
+      "total_ms": 11.9859,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 224,
+      "decode_ms": 0.3591,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 10.2747,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5141,
+      "total_ms": 13.1486,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 225,
+      "decode_ms": 0.3831,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 12.2787,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.5958,
+      "total_ms": 15.2583,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 226,
+      "decode_ms": 0.3634,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.5315,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4846,
+      "total_ms": 12.3804,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 227,
+      "decode_ms": 0.3803,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.8426,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.4184,
+      "total_ms": 14.6422,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 228,
+      "decode_ms": 0.3576,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 13.0397,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.2755,
+      "total_ms": 15.6737,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 229,
+      "decode_ms": 0.3811,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.359,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6353,
+      "total_ms": 12.3762,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 230,
+      "decode_ms": 0.3492,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.73,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6876,
+      "total_ms": 12.7677,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 231,
+      "decode_ms": 0.38,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.1136,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7423,
+      "total_ms": 12.2367,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 232,
+      "decode_ms": 0.3822,
+      "preprocess_ms": 0.0009,
+      "inference_ms": 12.0361,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9547,
+      "total_ms": 15.3743,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 233,
+      "decode_ms": 0.7695,
+      "preprocess_ms": 0.0013,
+      "inference_ms": 14.4423,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.1608,
+      "total_ms": 18.3744,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 234,
+      "decode_ms": 0.5682,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 12.3318,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.0084,
+      "total_ms": 15.9095,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 235,
+      "decode_ms": 0.5185,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 13.5973,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7101,
+      "total_ms": 16.8269,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 236,
+      "decode_ms": 0.4337,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 10.9125,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 3.0683,
+      "total_ms": 14.4157,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 237,
+      "decode_ms": 0.4562,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 13.2629,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7612,
+      "total_ms": 16.4813,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 238,
+      "decode_ms": 0.4248,
+      "preprocess_ms": 0.0008,
+      "inference_ms": 10.5453,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 3.344,
+      "total_ms": 14.3153,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 239,
+      "decode_ms": 0.5604,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 11.0729,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6435,
+      "total_ms": 14.2779,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 240,
+      "decode_ms": 0.5147,
+      "preprocess_ms": 0.0005,
+      "inference_ms": 10.0472,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.3013,
+      "total_ms": 12.8643,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 241,
+      "decode_ms": 0.4289,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 13.6109,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 3.4686,
+      "total_ms": 17.5095,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 242,
+      "decode_ms": 0.5307,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 18.0493,
+      "postprocess_ms": 0.0011,
+      "draw_write_ms": 2.6944,
+      "total_ms": 21.2761,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 243,
+      "decode_ms": 0.3776,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.4252,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.602,
+      "total_ms": 12.4057,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 244,
+      "decode_ms": 0.3545,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.2573,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.5118,
+      "total_ms": 12.1244,
+      "n_detections": 1
+    },
+    {
+      "frame_index": 245,
+      "decode_ms": 0.4139,
+      "preprocess_ms": 0.0006,
+      "inference_ms": 13.8507,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.7373,
+      "total_ms": 17.003,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 246,
+      "decode_ms": 0.4916,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.452,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.619,
+      "total_ms": 12.5634,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 247,
+      "decode_ms": 0.3595,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.2153,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.8885,
+      "total_ms": 12.464,
+      "n_detections": 5
+    },
+    {
+      "frame_index": 248,
+      "decode_ms": 0.3531,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.1781,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.9265,
+      "total_ms": 12.4586,
+      "n_detections": 5
+    },
+    {
+      "frame_index": 249,
+      "decode_ms": 0.3613,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.3531,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.9378,
+      "total_ms": 12.6529,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 250,
+      "decode_ms": 0.3562,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.828,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7062,
+      "total_ms": 13.8912,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 251,
+      "decode_ms": 0.3622,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 13.2811,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.9633,
+      "total_ms": 16.6074,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 252,
+      "decode_ms": 0.3647,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 13.1531,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.2934,
+      "total_ms": 15.812,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 253,
+      "decode_ms": 0.382,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 11.4141,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.7817,
+      "total_ms": 14.5785,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 254,
+      "decode_ms": 0.3576,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.5337,
+      "postprocess_ms": 0.0006,
+      "draw_write_ms": 2.5578,
+      "total_ms": 12.45,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 255,
+      "decode_ms": 0.3487,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 10.8125,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.8241,
+      "total_ms": 13.9862,
+      "n_detections": 3
+    },
+    {
+      "frame_index": 256,
+      "decode_ms": 0.3574,
+      "preprocess_ms": 0.0003,
+      "inference_ms": 9.499,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.6776,
+      "total_ms": 12.5348,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 257,
+      "decode_ms": 0.3553,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 9.2233,
+      "postprocess_ms": 0.0004,
+      "draw_write_ms": 2.6471,
+      "total_ms": 12.2265,
+      "n_detections": 2
+    },
+    {
+      "frame_index": 258,
+      "decode_ms": 0.3569,
+      "preprocess_ms": 0.0004,
+      "inference_ms": 11.0851,
+      "postprocess_ms": 0.0005,
+      "draw_write_ms": 2.413,
+      "total_ms": 13.8559,
+      "n_detections": 2
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "project": {
+    "name": "person_ai_analytic",
+    "milestone": "M7-PREP",
+    "package_version": "1.0.0",
+    "package_created_at": "2026-07-08T13:57:46Z"
+  },
+  "model": {
+    "name": "YOLO11n",
+    "variant": "yolo11n",
+    "format": "ONNX",
+    "opset": 12,
+    "path": "models/yolo11n.onnx",
+    "file_size_bytes": 10741320,
+    "sha256": "2d1acca764239e491cb1b6ac1150e7367236e12355af0d2109215a3bab56d39e",
+    "export_timestamp": "2026-07-08T08:40:33Z",
+    "source_pt": "models/yolo11n.pt"
+  },
+  "input": {
+    "tensor_name": "images",
+    "shape": [
+      1,
+      3,
+      640,
+      640
+    ],
+    "dtype": "float32",
+    "layout": "NCHW",
+    "color_space": "RGB"
+  },
+  "preprocessing": {
+    "source_color_space": "BGR",
+    "target_color_space": "RGB",
+    "resize_strategy": "letterbox",
+    "target_size": [
+      640,
+      640
+    ],
+    "letterbox_pad_color": [
+      114,
+      114,
+      114
+    ],
+    "normalization": "0-1",
+    "normalization_formula": "pixel / 255.0",
+    "channel_order": "CHW",
+    "batch_dimension": true,
+    "interpolation": "cv2.INTER_LINEAR"
+  },
+  "output": {
+    "tensor_name": "output0",
+    "shape": [
+      1,
+      84,
+      8400
+    ],
+    "dtype": "float32",
+    "format": "84 = 4(cx,cy,w,h) + 80 class_scores"
+  },
+  "postprocessing": {
+    "confidence_threshold": 0.25,
+    "nms_iou_threshold": 0.45,
+    "person_class_id": 0,
+    "nms": true,
+    "nms_implementation": "pure_numpy",
+    "coordinate_space": "original_frame",
+    "coord_decode": "reverse_letterbox_then_clip"
+  },
+  "reference": {
+    "pytorch_model": "models/yolo11n.pt",
+    "onnx_parity_report": "reports/onnx_parity.json",
+    "local_benchmark_report": "reports/benchmark_local.json"
+  },
+  "test_data": {
+    "video": {
+      "path": "test_data/input.mp4",
+      "sha256": "f3686138ca686d76d9c3b06c1d840b8dbede66a70c5e5293f2c8059d2e3db5ae",
+      "file_size_bytes": 799105,
+      "frames": 259,
+      "resolution": "576x1024",
+      "fps": 30.0
+    },
+    "parity_frames": {
+      "dir": "test_data/parity_frames",
+      "format": "JPEG",
+      "naming": "frame_{:06d}.jpg",
+      "frame_indices": [
+        0,
+        30,
+        60,
+        79,
+        90,
+        120,
+        155,
+        180,
+        196,
+        258
+      ],
+      "count": 10,
+      "resolution": "576x1024",
+      "purpose": "PyTorch vs ONNX vs TensorRT parity comparison"
+    }
+  },
+  "parity_summary": {
+    "frames_compared": 10,
+    "detection_count_match": "10/10",
+    "mean_bbox_iou": 0.993142,
+    "min_bbox_iou": 0.967107,
+    "mean_confidence_diff": 0.010665,
+    "max_confidence_diff": 0.066529,
+    "decision": "READY_FOR_TENSORRT"
+  },
+  "local_benchmark_summary": {
+    "effective_fps": 44.5925,
+    "inference_mean_ms": 10.7833,
+    "total_mean_ms": 13.8256,
+    "processed_frames": 256,
+    "device": "cuda"
+  }
+}
