@@ -407,6 +407,49 @@ class TestTrackingPipelineSmoke:
 
         assert n_frames == self.SMOKE_FRAMES
 
+    def test_real_track_history_updates_m12_with_video_timestamps(self):
+        if not self._available():
+            pytest.skip("data/input.mp4 or models/yolo11n.pt not found")
+
+        from src.detectors.yolov11 import YOLO11Detector
+        from src.track_attributes.manager import TrackAttributeManager
+        from src.video_source import VideoSource
+
+        source = VideoSource(self.VIDEO_PATH)
+        detector = YOLO11Detector(model_path=self.MODEL_PATH, confidence=0.25)
+        tracker = ByteTrackTracker()
+        manager = TrackAttributeManager()
+        seen_profile = None
+        last_frame_index = None
+        last_timestamp_ms = None
+
+        try:
+            for frame_index, timestamp_ms, frame in source.frames():
+                detections = detector.predict(frame)
+                tracks = tracker.update(detections)
+                profiles = manager.update(
+                    tracks,
+                    frame_index=frame_index,
+                    timestamp_ms=timestamp_ms,
+                )
+                if profiles:
+                    seen_profile = profiles[0]
+                last_frame_index = frame_index
+                last_timestamp_ms = timestamp_ms
+                if frame_index + 1 >= self.SMOKE_FRAMES:
+                    break
+        finally:
+            source.release()
+            detector.release()
+            tracker.reset()
+
+        assert last_frame_index == self.SMOKE_FRAMES - 1
+        assert manager.last_frame_index == last_frame_index
+        assert manager.last_timestamp_ms == last_timestamp_ms
+        assert seen_profile is not None
+        assert seen_profile.trajectory
+        assert seen_profile.trajectory[-1].timestamp_ms <= last_timestamp_ms
+
     def test_draw_tracks_on_real_frame(self):
         if not self._available():
             pytest.skip("data/input.mp4 not found")
@@ -434,6 +477,7 @@ class TestTrackingOutputArtifacts:
     VIDEO_PATH = os.path.join("outputs", "tracking_output.mp4")
     SUMMARY_PATH = os.path.join("outputs", "tracking_summary.json")
     TRACKS_PATH = os.path.join("outputs", "tracking_tracks.json")
+    PROFILES_PATH = os.path.join("outputs", "tracking_profiles.json")
 
     def _skip_if_missing(self, path: str) -> None:
         if not os.path.isfile(path):
@@ -524,6 +568,7 @@ class TestTrackingOutputArtifacts:
             data = json.load(f)
         assert "latency" in data
         assert "tracker_update" in data["latency"]
+        assert "track_attribute_manager" in data["latency"]
 
     def test_summary_unique_track_ids_positive(self):
         self._skip_if_missing(self.SUMMARY_PATH)
@@ -553,6 +598,7 @@ class TestTrackingOutputArtifacts:
             data = json.load(f)
         for entry in data[:10]:  # check first 10 frames
             assert "frame_index" in entry
+            assert "timestamp_ms" in entry
             assert "tracks" in entry
             assert isinstance(entry["tracks"], list)
 
@@ -569,3 +615,13 @@ class TestTrackingOutputArtifacts:
                 assert "score" in t
                 assert len(t["bbox"]) == 4
                 break
+
+    def test_profiles_json_exists_and_is_valid(self):
+        self._skip_if_missing(self.PROFILES_PATH)
+        from src.track_attributes.artifacts import verify_profile_artifact
+
+        info = verify_profile_artifact(
+            self.PROFILES_PATH,
+            expected_processed_frames=259,
+        )
+        assert info["total_profiles"] > 0

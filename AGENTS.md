@@ -2,7 +2,7 @@
 
 ## 1. Project Goal
 
-Milestone hiện tại: **M12 — Track Attribute Manager foundation**.
+Milestone vừa hoàn tất: **M12 — Track Attribute Manager foundation**.
 
 ```text
 data/input.mp4
@@ -17,10 +17,11 @@ data/input.mp4
 → stable TrackProfile[]
 ```
 
-M01, M02 và M03 local baseline đã có implementation và artifact kiểm chứng.
+M01, M02, M03 và M12 local foundation đã có implementation, test và
+artifact kiểm chứng. Toàn bộ task M12-01 đến M12-06 đã hoàn tất.
 
-Target dài hạn là NVIDIA Orin, nhưng task M12 hiện tại chỉ chạy local và
-không thêm model thuộc tính mới.
+Target dài hạn là NVIDIA Orin. M12 hiện hoàn tất ở mức local foundation và
+chưa thêm model thuộc tính mới.
 
 ## 2. Current Scope
 
@@ -134,9 +135,9 @@ observation). M12 không được import `ultralytics`, `torch` hoặc model c�
 - Attribute cache không được tự chạy inference; model bên ngoài cung cấp observation.
 - Schema và lifecycle contract phải được chốt bằng unit test trước khi tích hợp pipeline.
 
-### M12 task sequence
+### M12 task sequence — hoàn tất
 
-Chỉ thực hiện một task tại một thời điểm theo thứ tự:
+Các task đã được hoàn tất theo thứ tự:
 
 1. **M12-01 — Contracts and schemas**
    - Chốt `TrackLifecycle`, `TrajectoryPoint`, `AttributeObservation`,

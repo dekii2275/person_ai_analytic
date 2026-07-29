@@ -539,7 +539,7 @@ Track = {
 | Công nghệ | Temporal voting + cache + state management |
 | Tài nguyên | CPU |
 | Ưu tiên | P1 |
-| Trạng thái | Chưa bắt đầu |
+| Trạng thái | Hoàn tất — local foundation |
 | Phụ thuộc | M03, M04 |
 | Input | Per-frame attributes |
 | Output | Stable track profile |
@@ -553,6 +553,18 @@ Track = {
 - Tổng hợp nhiều dự đoán bằng voting hoặc weighted score.
 - Giữ kết quả ổn định khi một vài frame bị nhiễu.
 - Xóa state khi track kết thúc và hết thời gian lưu.
+
+### Kết quả hiện tại
+
+- Đã hoàn tất M12-01 đến M12-06: schema, lifecycle, bounded trajectory,
+  attribute cache, inference scheduling và temporal voting deterministic.
+- `TrackAttributeManager` đã được nối sau `ByteTrackTracker` và dùng timestamp
+  thật từ `VideoSource`.
+- Pipeline xuất `tracking_profiles.json` theo schema
+  `m12.track_profiles.v1` và đo latency M12 riêng.
+- Đã smoke test và xác minh artifact trên `data/input.mp4` cùng MOT17-09.
+- Chưa tích hợp model thuộc tính; các module sau sẽ cung cấp
+  `AttributeObservation` cho manager.
 
 ### Hồ sơ track đề xuất
 

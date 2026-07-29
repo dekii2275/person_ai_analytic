@@ -1,5 +1,5 @@
 """
-main.py — pipeline orchestrator (M3 + M4 + M8).
+main.py — pipeline orchestrator (M3 + M4 + M8 + M12).
 
 Reads data/input.mp4, runs YOLO11n person detection on every frame,
 draws bounding boxes, and writes outputs/output.mp4.
@@ -17,6 +17,10 @@ Usage (M8 — tracking):
     python main.py --tracking
     python main.py --tracking --tracking-output outputs/tracking_output.mp4
 
+Usage (M12 — track profiles):
+    python main.py --tracking \
+        --tracking-profiles outputs/tracking_profiles.json
+
 Pipeline:
     VideoSource
         ↓  (frame_index, timestamp_ms, frame)
@@ -24,6 +28,8 @@ Pipeline:
         ↓  List[Detection]
     ByteTrackTracker
         ↓  List[Track]
+    TrackAttributeManager
+        ↓  List[TrackProfile]
     draw_tracks
         ↓  annotated frame
     cv2.VideoWriter
@@ -50,6 +56,13 @@ from src.benchmark import (
     save_json,
 )
 from src.detectors.yolov11 import YOLO11Detector
+from src.track_attributes.artifacts import (
+    build_profile_artifact,
+    save_profile_artifact,
+    verify_profile_artifact,
+)
+from src.track_attributes.manager import TrackAttributeManager
+from src.track_attributes.schemas import TrackProfile
 from src.trackers.bytetrack import ByteTrackConfig, ByteTrackTracker
 from src.video_source import VideoSource
 from src.visualization import draw_detections_inplace, draw_tracks_inplace
@@ -68,6 +81,9 @@ _DEFAULT_WARMUP_FRAMES = 3
 _DEFAULT_TRACKING_OUTPUT = os.path.join("outputs", "tracking_output.mp4")
 _DEFAULT_TRACKING_SUMMARY = os.path.join("outputs", "tracking_summary.json")
 _DEFAULT_TRACKING_TRACKS = os.path.join("outputs", "tracking_tracks.json")
+_DEFAULT_TRACKING_PROFILES = os.path.join(
+    "outputs", "tracking_profiles.json"
+)
 
 # Codec for output MP4 — mp4v is broadly readable on Linux
 _FOURCC = cv2.VideoWriter_fourcc(*"mp4v")
@@ -146,6 +162,15 @@ def _parse_args(argv=None) -> argparse.Namespace:
         default=_DEFAULT_TRACKING_TRACKS,
         dest="tracking_tracks",
         help=f"Per-frame track history JSON path (default: {_DEFAULT_TRACKING_TRACKS})",
+    )
+    parser.add_argument(
+        "--tracking-profiles",
+        default=_DEFAULT_TRACKING_PROFILES,
+        dest="tracking_profiles",
+        help=(
+            "M12 stable track profile JSON path "
+            f"(default: {_DEFAULT_TRACKING_PROFILES})"
+        ),
     )
     return parser.parse_args(argv)
 
@@ -491,22 +516,24 @@ def run_benchmark(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Tracking pipeline (M8)
+# Tracking + track profile pipeline (M8 + M12)
 # ---------------------------------------------------------------------------
 
 def run_tracking(args: argparse.Namespace) -> None:
-    """Run the full tracking pipeline with ByteTrack.
+    """Run tracking with ByteTrack and M12 track state management.
 
     Stages per frame:
         decode     — frame copy (isolate from draw)
         detect     — YOLO11Detector.predict()
         track      — ByteTrackTracker.update()
+        profile    — TrackAttributeManager.update()
         draw_write — draw_tracks_inplace + writer.write
 
     Outputs:
         tracking_output.mp4     — annotated video with Track IDs
         tracking_summary.json   — pipeline statistics
         tracking_tracks.json    — per-frame track history
+        tracking_profiles.json  — final snapshot for every observed Track ID
     """
     import json  # noqa: PLC0415
 
@@ -537,6 +564,10 @@ def run_tracking(args: argparse.Namespace) -> None:
         config=ByteTrackConfig(frame_rate=int(source.fps))
     )
     print(f"[M8] Tracker  : {tracker}")
+
+    # --- M12 Track Attribute Manager ---------------------------------------
+    profile_manager = TrackAttributeManager()
+    print(f"[M12] Manager : {profile_manager}")
     print()
 
     # --- VideoWriter -------------------------------------------------------
@@ -550,17 +581,19 @@ def run_tracking(args: argparse.Namespace) -> None:
     # --- Timing accumulators -----------------------------------------------
     detect_times: list[float] = []
     track_times: list[float] = []
+    profile_times: list[float] = []
     draw_write_times: list[float] = []
 
     # --- Tracking statistics -----------------------------------------------
     all_track_ids: set[int] = set()
     active_counts: list[int] = []
     track_history: list[dict] = []
+    latest_profiles: dict[int, TrackProfile] = {}
 
     t_wall_start = time.perf_counter()
 
     try:
-        for frame_index, _ts_ms, frame in source.frames():
+        for frame_index, timestamp_ms, frame in source.frames():
             frame_copy = frame.copy()
 
             # ---- Detect ---------------------------------------------------
@@ -573,6 +606,19 @@ def run_tracking(args: argparse.Namespace) -> None:
             tracks = tracker.update(detections=detections, frame=frame_copy)
             track_times.append((time.perf_counter() - t1) * 1000)
 
+            # ---- M12 Track profiles --------------------------------------
+            t_profile = time.perf_counter()
+            profiles = profile_manager.update(
+                tracks,
+                frame_index=frame_index,
+                timestamp_ms=timestamp_ms,
+            )
+            profile_times.append(
+                (time.perf_counter() - t_profile) * 1000
+            )
+            for profile in profiles:
+                latest_profiles[profile.track_id] = profile
+
             # ---- Collect stats --------------------------------------------
             for t in tracks:
                 all_track_ids.add(t.track_id)
@@ -581,6 +627,7 @@ def run_tracking(args: argparse.Namespace) -> None:
             # Per-frame history (compact)
             track_history.append({
                 "frame_index": frame_index,
+                "timestamp_ms": round(timestamp_ms, 4),
                 "tracks": [
                     {
                         "track_id": t.track_id,
@@ -611,6 +658,7 @@ def run_tracking(args: argparse.Namespace) -> None:
         writer.release()
         detector.release()
         tracker.reset()
+        profile_manager.reset()
         source.release()
 
     t_wall_end = time.perf_counter()
@@ -635,11 +683,13 @@ def run_tracking(args: argparse.Namespace) -> None:
             "video":    args.source,
             "detector": "YOLO11n PyTorch",
             "tracker":  "ByteTrack",
+            "profile_manager": "TrackAttributeManager",
             "confidence_threshold": args.confidence,
         },
         "summary": {
             "processed_frames":     processed,
             "total_unique_track_ids": len(all_track_ids),
+            "total_profile_ids": len(latest_profiles),
             "max_concurrent_tracks": max(active_counts) if active_counts else 0,
             "mean_active_tracks":   round(sum(active_counts) / max(processed, 1), 4),
             "effective_fps":        round(processed / max(wall_time, 1e-6), 4),
@@ -648,6 +698,7 @@ def run_tracking(args: argparse.Namespace) -> None:
         "latency": {
             "detect":     _stats(detect_times),
             "tracker_update": _stats(track_times),
+            "track_attribute_manager": _stats(profile_times),
             "draw_write": _stats(draw_write_times),
         },
     }
@@ -663,18 +714,42 @@ def run_tracking(args: argparse.Namespace) -> None:
     if track_times:
         print(f"[M8] Tracker mean latency: {_stats(track_times)['mean_ms']:.3f} ms")
         print(f"[M8] Tracker p95 latency : {_stats(track_times)['p95_ms']:.3f} ms")
+    if profile_times:
+        print(
+            "[M12] Manager mean latency: "
+            f"{_stats(profile_times)['mean_ms']:.3f} ms"
+        )
+        print(
+            "[M12] Manager p95 latency : "
+            f"{_stats(profile_times)['p95_ms']:.3f} ms"
+        )
     print("[M8] " + "=" * 50)
 
     # --- Save JSONs ----------------------------------------------------------
     os.makedirs(os.path.dirname(args.tracking_summary) or ".", exist_ok=True)
-    with open(args.tracking_summary, "w") as f:
+    with open(args.tracking_summary, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
     print(f"[M8] Summary  → {args.tracking_summary}")
 
     os.makedirs(os.path.dirname(args.tracking_tracks) or ".", exist_ok=True)
-    with open(args.tracking_tracks, "w") as f:
+    with open(args.tracking_tracks, "w", encoding="utf-8") as f:
         json.dump(track_history, f, indent=2)
     print(f"[M8] Tracks   → {args.tracking_tracks}")
+
+    profile_artifact = build_profile_artifact(
+        list(latest_profiles.values()),
+        source=args.source,
+        processed_frames=processed,
+    )
+    save_profile_artifact(profile_artifact, args.tracking_profiles)
+    profile_info = verify_profile_artifact(
+        args.tracking_profiles,
+        expected_processed_frames=processed,
+    )
+    print(
+        f"[M12] Profiles → {args.tracking_profiles} "
+        f"({profile_info['total_profiles']} profiles, verified)"
+    )
 
     # --- Verify output video -----------------------------------------------
     print(f"\n[M8] Verifying output: {args.tracking_output} ...")
