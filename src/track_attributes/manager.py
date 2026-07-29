@@ -15,10 +15,14 @@ from typing import Deque, Dict, List, Optional, Tuple
 
 from src.schemas import Track
 from src.track_attributes.schemas import (
+    AttributeObservation,
     TrackLifecycle,
     TrackProfile,
     TrajectoryPoint,
 )
+
+_AttributeKey = Tuple[str, str]
+_InferenceStamp = Tuple[int, float]
 
 
 def _require_int(value: object, name: str, *, minimum: int) -> None:
@@ -37,6 +41,22 @@ def _require_timestamp(value: object, name: str) -> None:
         raise ValueError(f"{name} must be >= 0, got {value}")
 
 
+def _require_unit_interval(value: object, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{name} must be a number, got {value!r}")
+    if not math.isfinite(value):
+        raise ValueError(f"{name} must be finite, got {value!r}")
+    if not 0.0 <= value <= 1.0:
+        raise ValueError(f"{name} must be in [0, 1], got {value}")
+
+
+def _require_name(value: object, name: str) -> None:
+    if not isinstance(value, str):
+        raise TypeError(f"{name} must be a string, got {value!r}")
+    if not value.strip():
+        raise ValueError(f"{name} must not be blank")
+
+
 @dataclass(frozen=True)
 class TrackAttributeManagerConfig:
     """Lifecycle and retention configuration.
@@ -45,12 +65,17 @@ class TrackAttributeManagerConfig:
     ``removed`` once consecutive missing frames exceed
     ``max_missed_frames``.  Removed state is retained for
     ``removed_ttl_ms`` before cleanup.  Each track retains only its most
-    recent ``max_trajectory_points`` bottom-center observations.
+    recent ``max_trajectory_points`` bottom-center observations.  Attribute
+    inference is gated by frame interval and crop quality, with a separate
+    bounded observation cache per namespace/key.
     """
 
     max_missed_frames: int = 30
     removed_ttl_ms: float = 5_000.0
     max_trajectory_points: int = 120
+    inference_interval_frames: int = 10
+    min_inference_quality_score: float = 0.5
+    max_observations_per_attribute: int = 30
 
     def __post_init__(self) -> None:
         _require_int(
@@ -65,6 +90,20 @@ class TrackAttributeManagerConfig:
         _require_int(
             self.max_trajectory_points,
             "TrackAttributeManagerConfig.max_trajectory_points",
+            minimum=1,
+        )
+        _require_int(
+            self.inference_interval_frames,
+            "TrackAttributeManagerConfig.inference_interval_frames",
+            minimum=1,
+        )
+        _require_unit_interval(
+            self.min_inference_quality_score,
+            "TrackAttributeManagerConfig.min_inference_quality_score",
+        )
+        _require_int(
+            self.max_observations_per_attribute,
+            "TrackAttributeManagerConfig.max_observations_per_attribute",
             minimum=1,
         )
 
@@ -83,6 +122,8 @@ class _TrackState:
     observed_frames: int
     missed_frames: int
     trajectory: Deque[TrajectoryPoint]
+    observations: Dict[_AttributeKey, Deque[AttributeObservation]]
+    last_inference: Dict[_AttributeKey, _InferenceStamp]
     removed_at_ms: Optional[float] = None
 
     @classmethod
@@ -108,6 +149,8 @@ class _TrackState:
                 (point,),
                 maxlen=max_trajectory_points,
             ),
+            observations={},
+            last_inference={},
         )
 
     def observe(
@@ -270,6 +313,135 @@ class TrackAttributeManager:
             )
         ]
 
+    def should_infer(
+        self,
+        track_id: int,
+        namespace: str,
+        key: str,
+        quality_score: float,
+    ) -> bool:
+        """Return whether an external model should run on the current frame.
+
+        This method is pure: callers must use ``record_inference`` or
+        ``record_observation`` after actually running a model.
+        """
+        attribute_key = self._validate_attribute_key(namespace, key)
+        _require_unit_interval(quality_score, "quality_score")
+        state = self._get_state(track_id)
+
+        if state.lifecycle is not TrackLifecycle.ACTIVE:
+            return False
+        if quality_score < self._config.min_inference_quality_score:
+            return False
+
+        frame_index, _timestamp_ms = self._current_stamp_for(state)
+        last = state.last_inference.get(attribute_key)
+        if last is None:
+            return True
+        return (
+            frame_index - last[0]
+            >= self._config.inference_interval_frames
+        )
+
+    def record_inference(
+        self,
+        track_id: int,
+        namespace: str,
+        key: str,
+    ) -> None:
+        """Record an external inference attempt on the current frame."""
+        attribute_key = self._validate_attribute_key(namespace, key)
+        state = self._require_current_active_state(track_id)
+        current = self._current_stamp_for(state)
+        last = state.last_inference.get(attribute_key)
+        if last is not None and current[0] <= last[0]:
+            raise ValueError(
+                f"Inference already recorded for {namespace}/{key} "
+                f"at frame {current[0]}"
+            )
+        state.last_inference[attribute_key] = current
+
+    def record_observation(
+        self,
+        track_id: int,
+        observation: AttributeObservation,
+    ) -> None:
+        """Cache one external model observation for the current frame."""
+        if not isinstance(observation, AttributeObservation):
+            raise TypeError(
+                "observation must be an AttributeObservation"
+            )
+
+        state = self._require_current_active_state(track_id)
+        frame_index, timestamp_ms = self._current_stamp_for(state)
+        if observation.frame_index != frame_index:
+            raise ValueError(
+                "AttributeObservation.frame_index must match current "
+                "manager frame"
+            )
+        if not math.isclose(
+            observation.timestamp_ms,
+            timestamp_ms,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise ValueError(
+                "AttributeObservation.timestamp_ms must match current "
+                "manager timestamp"
+            )
+
+        attribute_key = (observation.namespace, observation.key)
+        cached = state.observations.get(attribute_key)
+        if (
+            cached is not None
+            and cached
+            and observation.frame_index <= cached[-1].frame_index
+        ):
+            raise ValueError(
+                f"Observation already cached for "
+                f"{observation.namespace}/{observation.key} "
+                f"at frame {observation.frame_index}"
+            )
+
+        last = state.last_inference.get(attribute_key)
+        if last is not None and observation.frame_index < last[0]:
+            raise ValueError(
+                "Observation cannot precede the last inference frame"
+            )
+
+        if cached is None:
+            cached = deque(
+                maxlen=self._config.max_observations_per_attribute
+            )
+            state.observations[attribute_key] = cached
+        cached.append(observation)
+        state.last_inference[attribute_key] = (
+            observation.frame_index,
+            observation.timestamp_ms,
+        )
+
+    def get_observations(
+        self,
+        track_id: int,
+        namespace: str,
+        key: str,
+    ) -> Tuple[AttributeObservation, ...]:
+        """Return an immutable snapshot of cached observations."""
+        attribute_key = self._validate_attribute_key(namespace, key)
+        state = self._get_state(track_id)
+        return tuple(state.observations.get(attribute_key, ()))
+
+    def get_last_inference(
+        self,
+        track_id: int,
+        namespace: str,
+        key: str,
+    ) -> Optional[_InferenceStamp]:
+        """Return ``(frame_index, timestamp_ms)`` for the latest inference."""
+        attribute_key = self._validate_attribute_key(namespace, key)
+        state = self._get_state(track_id)
+        return state.last_inference.get(attribute_key)
+
     def cleanup(self, timestamp_ms: float) -> List[int]:
         """Delete removed states whose retention TTL has elapsed.
 
@@ -374,6 +546,50 @@ class TrackAttributeManager:
             del self._states[track_id]
         return expired_ids
 
+    @staticmethod
+    def _validate_attribute_key(
+        namespace: str,
+        key: str,
+    ) -> _AttributeKey:
+        _require_name(namespace, "namespace")
+        _require_name(key, "key")
+        return namespace, key
+
+    def _get_state(self, track_id: int) -> _TrackState:
+        _require_int(track_id, "track_id", minimum=0)
+        state = self._states.get(track_id)
+        if state is None:
+            raise KeyError(f"Unknown track_id: {track_id}")
+        return state
+
+    def _require_current_active_state(self, track_id: int) -> _TrackState:
+        state = self._get_state(track_id)
+        if state.lifecycle is not TrackLifecycle.ACTIVE:
+            raise ValueError(
+                f"Track ID {track_id} must be active to record inference"
+            )
+        self._current_stamp_for(state)
+        return state
+
+    def _current_stamp_for(self, state: _TrackState) -> _InferenceStamp:
+        if self._last_frame_index is None or self._last_timestamp_ms is None:
+            raise RuntimeError(
+                "TrackAttributeManager.update must run before scheduling"
+            )
+        if (
+            state.last_seen_frame_index != self._last_frame_index
+            or not math.isclose(
+                state.last_seen_ms,
+                self._last_timestamp_ms,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+        ):
+            raise RuntimeError(
+                "Track is not observed on the current manager frame"
+            )
+        return self._last_frame_index, self._last_timestamp_ms
+
     def __len__(self) -> int:
         return len(self._states)
 
@@ -384,7 +600,11 @@ class TrackAttributeManager:
             f"max_missed_frames={self._config.max_missed_frames}, "
             f"removed_ttl_ms={self._config.removed_ttl_ms}, "
             f"max_trajectory_points="
-            f"{self._config.max_trajectory_points})"
+            f"{self._config.max_trajectory_points}, "
+            f"inference_interval_frames="
+            f"{self._config.inference_interval_frames}, "
+            f"max_observations_per_attribute="
+            f"{self._config.max_observations_per_attribute})"
         )
 
 
