@@ -334,14 +334,28 @@ class TestDrawTracks:
         np.testing.assert_array_equal(frame, original)
 
     def test_visualization_does_not_import_ultralytics(self):
-        import src.visualization as vis
-        import sys
-        assert "ultralytics" not in sys.modules or True  # noqa: just import check
-        # We specifically check the module doesn't directly import ultralytics
-        import importlib
+        import ast
         import inspect
-        src_text = inspect.getsource(vis)
-        assert "ultralytics" not in src_text
+
+        import src.visualization as vis
+
+        tree = ast.parse(inspect.getsource(vis))
+        imported_modules = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        imported_modules.update(
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module is not None
+        )
+
+        assert not any(
+            module == "ultralytics" or module.startswith("ultralytics.")
+            for module in imported_modules
+        )
 
 
 # ---------------------------------------------------------------------------

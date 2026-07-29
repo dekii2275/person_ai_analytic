@@ -218,3 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 outputs/*.mp4
 outputs/*.json
+
+# Local datasets and generated test media.
+# Existing files already tracked by Git (for example data/input.mp4) stay tracked.
+data/
