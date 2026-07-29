@@ -2,7 +2,7 @@
 
 ## 1. Project Goal
 
-Milestone vừa hoàn tất: **M12 — Track Attribute Manager foundation**.
+Milestone hiện tại: **M04 — Person Attribute Recognition local baseline**.
 
 ```text
 data/input.mp4
@@ -14,14 +14,18 @@ data/input.mp4
 → state keyed by Track ID
 → bounded trajectory + lifecycle
 → attribute cache + temporal voting
+→ person crop + lightweight body attribute inference
+→ body AttributeObservation[]
 → stable TrackProfile[]
 ```
 
 M01, M02, M03 và M12 local foundation đã có implementation, test và
 artifact kiểm chứng. Toàn bộ task M12-01 đến M12-06 đã hoàn tất.
 
-Target dài hạn là NVIDIA Orin. M12 hiện hoàn tất ở mức local foundation và
-chưa thêm model thuộc tính mới.
+M04-00 và M04-01 đã hoàn tất: phạm vi milestone, contract và taxonomy đã
+được chốt trước khi đánh giá hoặc tích hợp model. Target dài hạn vẫn là
+NVIDIA Orin, nhưng M04 phải có local baseline chạy được khi chưa có thiết bị
+Orin.
 
 ## 2. Current Scope
 
@@ -43,6 +47,14 @@ chưa thêm model thuộc tính mới.
 - temporal voting / weighted aggregation;
 - cleanup theo TTL và giới hạn bộ nhớ;
 - stable TrackProfile schema;
+- framework-independent body attribute schema và recognizer interface;
+- taxonomy thuộc tính toàn thân M04;
+- person crop extraction và crop quality gate;
+- đánh giá model PAR pretrained nhẹ;
+- local body attribute inference;
+- chuyển body attribute prediction thành `AttributeObservation`;
+- tích hợp M04 sau M03 và trước temporal aggregation của M12;
+- body attribute artifacts và latency benchmark riêng;
 - visualization;
 - output video;
 - latency benchmark;
@@ -54,7 +66,6 @@ Không được phép:
 
 - detector hoặc tracker backend mới;
 - ReID;
-- body attribute model / person attribute inference;
 - clothing color;
 - face pipeline;
 - crowd/behavior;
@@ -123,6 +134,84 @@ tracker module.
 
 M12 chỉ nhận schema framework-independent (`Track`, timestamp và attribute
 observation). M12 không được import `ultralytics`, `torch` hoặc model cụ thể.
+
+Mọi body attribute recognizer phải trả về schema chung:
+
+```python
+BodyAttributePrediction(
+    key: BodyAttributeKey,
+    value: bool,
+    score: float,
+)
+```
+
+Không leak tensor, logits hoặc object backend-specific ra ngoài module
+recognizer. M04 dùng person crop BGR `uint8` và không được thay đổi
+`Detection`, `Track` hoặc schema M12 để phù hợp riêng với một model.
+
+### M04 rules
+
+- Namespace khi đưa observation vào M12 phải là `body`.
+- Taxonomy baseline chỉ gồm `backpack`, `bag`, `hat` và `long_sleeve`.
+- Giá trị của taxonomy baseline là boolean; confidence phải nằm trong `[0, 1]`.
+- `glasses` chỉ được thêm sau khi model và chất lượng crop được đánh giá.
+- Không đưa màu áo/quần vào M04; đó là phạm vi M05.
+- Không inference mọi frame hoặc mọi track nếu crop không đạt quality gate.
+- Timestamp và frame index của observation phải lấy từ `VideoSource`.
+- Backend local phải nằm sau interface chung và không được leak object model.
+- Model, weights, license và label mapping phải được kiểm chứng trước tích hợp.
+- Contract và taxonomy phải có unit test trước khi thêm model backend.
+
+### M04 task sequence
+
+1. **M04-00 — Scope and roadmap**
+   - Chuyển milestone hiện tại từ M12 sang M04.
+   - Mở đúng phạm vi body attributes và giữ các module khác ngoài scope.
+   - Đồng bộ trạng thái và bước tiếp theo trong tài liệu kế hoạch.
+
+2. **M04-01 — Contracts and taxonomy**
+   - Chốt namespace `body`, schema `BodyAttributePrediction` và interface
+     `BaseBodyAttributeRecognizer`.
+   - Chốt taxonomy boolean baseline: `backpack`, `bag`, `hat`,
+     `long_sleeve`.
+   - Chốt validation, immutability và JSON shape bằng unit test.
+
+3. **M04-02 — Model evaluation**
+   - So sánh model PAR pretrained nhẹ theo label coverage, license,
+     preprocessing, latency CPU và khả năng chuyển backend sau này.
+   - Dùng tập person crop có ground truth thủ công.
+   - Chưa tích hợp pipeline trong task này.
+
+4. **M04-03 — Crop and quality gate**
+   - Clip person bbox, reject crop không hợp lệ hoặc quá nhỏ.
+   - Tính quality score deterministic và test các trường hợp biên.
+
+5. **M04-04 — Local model adapter**
+   - Implement preprocessing, inference và label mapping sau interface chung.
+   - Unit test postprocessing và smoke test bằng weights thật.
+
+6. **M04-05 — M03/M04/M12 integration**
+   - Dùng scheduling của M12 để giới hạn inference theo Track ID.
+   - Chuyển prediction thành `AttributeObservation` với timestamp thật.
+   - Temporal voting tạo stable body attributes.
+
+7. **M04-06 — Artifacts and benchmark**
+   - Xuất stable body attributes trong track profile artifact.
+   - Báo latency crop, M04 inference và M12 aggregation riêng.
+   - Smoke test, parse JSON và mở lại output video bằng code.
+
+### M04 acceptance criteria
+
+- Toàn bộ regression test M01–M03 và M12 vẫn pass.
+- Unit test cover taxonomy, schema validation, immutability và JSON shape.
+- M04 contract không import backend inference cụ thể.
+- Crop/quality gate và inference interval deterministic, có test biên.
+- Số lần model inference nhỏ hơn số track-frame đủ điều kiện trên video smoke.
+- Stable body attributes chỉ xuất hiện sau minimum observations của M12.
+- JSON artifact parse được và benchmark báo latency M04 riêng.
+- Có đánh giá bằng ground truth thủ công; không tuyên bố accuracy chỉ từ
+  kiểm tra trực quan.
+- Không thêm clothing color, face attributes, ReID hoặc backend production.
 
 ### M12 state rules
 
@@ -214,8 +303,9 @@ Không nói "video output hợp lệ" nếu chưa mở lại bằng code.
 
 Không nói "benchmark xong" nếu chưa sinh file thật.
 
-Không nói "M12 hoàn thành" nếu chưa chạy unit test lifecycle/cache/voting,
-integration test với track history thật và kiểm tra cleanup/bounded memory.
+Không nói "M04 hoàn thành" nếu chưa chạy unit test contract/crop/mapping,
+integration test với M12, smoke test bằng weights thật và kiểm tra artifact,
+latency cùng inference scheduling.
 
 ## 4. Required Workflow
 

@@ -160,7 +160,7 @@ Tối ưu model và tích hợp pipeline đa luồng trên NVIDIA Orin bằng ON
 | Công nghệ | OpenCV ở baseline; GStreamer/DeepStream khi production |
 | Tài nguyên | CPU / Video Engine |
 | Ưu tiên | P0 |
-| Trạng thái | Đang chuẩn bị |
+| Trạng thái | Hoàn tất — local baseline |
 | Phụ thuộc | Không |
 | Input | MP4 / Camera / RTSP |
 | Output | Frame + timestamp |
@@ -201,7 +201,7 @@ VideoFrame = {
 | Công nghệ | YOLO11n → ONNX → TensorRT |
 | Tài nguyên | GPU trên Orin |
 | Ưu tiên | P0 |
-| Trạng thái | Đang chuẩn bị |
+| Trạng thái | Hoàn tất — local baseline |
 | Phụ thuộc | M01 |
 | Input | Frame |
 | Output | `PersonDetection[]` |
@@ -248,7 +248,7 @@ PersonDetection = {
 | Công nghệ | ByteTrack hoặc DeepStream Tracker |
 | Tài nguyên | CPU/GPU tùy tracker |
 | Ưu tiên | P1 |
-| Trạng thái | Chưa bắt đầu |
+| Trạng thái | Hoàn tất — local baseline |
 | Phụ thuộc | M02 |
 | Input | `PersonDetection[]` |
 | Output | `Track[]` |
@@ -286,9 +286,9 @@ Track = {
 | Nhóm | Attributes |
 | Mục tiêu | Nhận diện thuộc tính toàn thân: trang phục, mũ, kính, balo, tay áo... |
 | Công nghệ | Lightweight multi-label PAR model |
-| Tài nguyên | GPU trên Orin |
+| Tài nguyên | CPU local baseline; GPU trên Orin sau |
 | Ưu tiên | P1 |
-| Trạng thái | Chưa bắt đầu |
+| Trạng thái | Đang thực hiện — M04-00/M04-01 hoàn tất |
 | Phụ thuộc | M03 |
 | Input | Person crop theo Track ID |
 | Output | Body attributes |
@@ -309,6 +309,49 @@ Track = {
 - Chỉ chạy khi crop đủ lớn và đủ rõ.
 - Có khoảng nghỉ giữa hai lần inference trên cùng Track ID.
 - Kết quả phải được đưa qua M12 để temporal voting.
+
+### Phạm vi local baseline
+
+- Namespace ổn định khi đưa kết quả vào M12 là `body`.
+- Taxonomy boolean ban đầu gồm `backpack`, `bag`, `hat` và `long_sleeve`.
+- `glasses` chỉ được bổ sung sau khi model và chất lượng person crop chứng minh
+  kết quả phù hợp.
+- Màu áo/quần thuộc M05 và không nằm trong M04.
+- Recognizer nhận person crop BGR `uint8` và chỉ trả contract
+  framework-independent; tensor, logits hoặc object backend không được thoát
+  khỏi module.
+- Local baseline phải chạy được trên CPU khi chưa có NVIDIA Orin.
+
+### Chuỗi task M04
+
+1. **M04-00 — Scope and roadmap**
+   - Mở phạm vi M04 trong `AGENTS.md`.
+   - Đồng bộ roadmap và trạng thái hiện tại.
+2. **M04-01 — Contracts and taxonomy**
+   - Chốt `BodyAttributeKey`, `BodyAttributePrediction` và
+     `BaseBodyAttributeRecognizer`.
+   - Unit test validation, immutability, JSON shape và backend isolation.
+3. **M04-02 — Model evaluation**
+   - So sánh các model pretrained nhẹ bằng tập crop có nhãn thủ công.
+   - Kiểm tra license, label coverage, preprocessing và latency CPU.
+4. **M04-03 — Crop and quality gate**
+   - Clip bbox, reject crop lỗi/quá nhỏ và tính quality score deterministic.
+5. **M04-04 — Local model adapter**
+   - Implement backend được chọn, preprocessing và label mapping.
+6. **M04-05 — M03/M04/M12 integration**
+   - Schedule theo Track ID, tạo `AttributeObservation` và temporal voting.
+7. **M04-06 — Artifacts and benchmark**
+   - Xuất stable body attributes, latency riêng và smoke-test artifacts.
+
+### Tiêu chí hoàn thành local baseline
+
+- Regression test M01–M03 và M12 vẫn pass.
+- Contract/taxonomy, crop gate và label mapping có unit test.
+- Không inference mọi frame; số lần inference được báo trong artifact.
+- Stable body attributes được tạo qua temporal voting của M12.
+- Có đánh giá trên person crop được gắn nhãn thủ công.
+- JSON artifact parse được và latency M04 được đo riêng.
+- Không mở rộng sang clothing color, face attributes hoặc ReID.
 
 ---
 
@@ -648,11 +691,11 @@ Track = {
 | Công nghệ | ONNX + TensorRT |
 | Tài nguyên | NVIDIA Orin |
 | Ưu tiên | P0 |
-| Trạng thái | Chưa bắt đầu |
+| Trạng thái | Tạm hoãn — chờ thiết bị Orin |
 | Phụ thuộc | M02 |
 | Input | ONNX model |
 | Output | TensorRT inference |
-| Ghi chú | Build engine cho đúng target Orin |
+| Ghi chú | Local deployment package đã sẵn sàng; chưa build engine |
 
 ### Trách nhiệm
 
@@ -1215,28 +1258,26 @@ Hệ thống dự kiến cung cấp ba nhóm đầu ra:
 
 ## 19. Trạng thái hiện tại
 
-Tại thời điểm lập tài liệu:
-
-- M01 đang chuẩn bị và mới giới hạn ở nguồn `input.mp4`.
-- M02 đang chuẩn bị và là module được triển khai đầu tiên.
-- M03 đến M15 chưa bắt đầu.
-- Kiến trúc production với GStreamer/DeepStream chưa được áp dụng ở local baseline.
-- Trọng tâm gần nhất là hoàn thiện luồng `input.mp4 → frame → person detection → bounding box`.
+- M01, M02 và M03 đã có local implementation, test và artifact.
+- M12-01 đến M12-06 đã hoàn tất ở mức local foundation.
+- M04 là milestone hiện tại; M04-00 và M04-01 đã hoàn tất phạm vi,
+  contract cùng taxonomy.
+- Chưa có NVIDIA Orin tại môi trường phát triển, vì vậy M14 tạm hoãn.
+- M05–M11, M13 và M15 chưa nằm trong milestone hiện tại.
+- Kiến trúc production với GStreamer/DeepStream chưa được áp dụng.
 
 ---
 
 ## 20. Bước tiếp theo đề xuất
 
-1. Tạo skeleton repository và cấu hình dự án.
-2. Hoàn thiện M01 với `input.mp4`, frame index, FPS và timestamp.
-3. Tích hợp YOLO11n cho M02 trên framework gốc.
-4. Chuẩn hóa output `PersonDetection`.
-5. Thêm visualization và benchmark.
-6. Export ONNX và so sánh đầu ra.
-7. Build TensorRT trên Orin.
-8. Sau khi detector ổn định, tích hợp ByteTrack cho M03.
-9. Xây dựng M12 sớm để làm nền cho tất cả secondary models.
-10. Chỉ sau đó mở rộng sang body attributes, face, crowd, behavior và event.
+1. Hoàn tất M04-00: mở phạm vi và đồng bộ roadmap.
+2. Hoàn tất M04-01: chốt contracts và taxonomy bằng unit test.
+3. Thực hiện M04-02: đánh giá model PAR pretrained nhẹ trên local CPU.
+4. Thực hiện M04-03: person crop và quality gate.
+5. Thực hiện M04-04: local model adapter.
+6. Thực hiện M04-05: tích hợp M03 → M04 → M12.
+7. Thực hiện M04-06: artifact, benchmark và smoke test.
+8. Quay lại M14 khi có thiết bị NVIDIA Orin.
 
 ---
 
@@ -1244,4 +1285,8 @@ Tại thời điểm lập tài liệu:
 
 Dự án là một hệ thống video analytics dạng module, lấy person detection và tracking làm lõi. Các chức năng nhận diện thuộc tính, khuôn mặt, đám đông và hành vi đều dựa trên Track ID và lịch sử theo thời gian. Kiến trúc ưu tiên model nhẹ, inference chọn lọc và temporal aggregation để đáp ứng giới hạn tài nguyên trên NVIDIA Orin.
 
-Chiến lược phù hợp nhất là hoàn thiện local baseline theo thứ tự M01 → M02 → M03 → M12, sau đó chuyển detection sang TensorRT qua M14, rồi mới tích hợp dần các secondary models và pipeline production M15. Cách tiếp cận này giảm rủi ro, dễ đo hiệu năng và tạo nền tảng ổn định cho toàn bộ hệ thống.
+Local foundation `M01 → M02 → M03 → M12` đã hoàn tất. Khi chưa có thiết
+bị Orin, bước tiếp theo là M04 local baseline để tạo body attribute
+observations và tận dụng scheduling/temporal voting của M12. M14 được tiếp
+tục khi có thiết bị phù hợp; các secondary model khác và M15 vẫn được tích
+hợp dần sau khi từng contract local ổn định.
