@@ -1,0 +1,14 @@
+frame_index,timestamp_ms,num_detections,max_confidence,review_category,issue_type,severity,note
+0,0.0,1,0.956,back_view,none,none,Green shirt walking away near camera. Feet cut at bottom. BBox correct head-to-hip. Slight motion blur.
+30,1000.0,1,0.9437,side_view,none,none,Green shirt sideways/turning near camera. BBox correct. Slight motion blur. Partial body (legs cut).
+60,2000.0,1,0.9553,normal,none,none,Green shirt facing camera near camera. Clear detection. No blur. Partial body (legs cut). High confidence.
+79,2633.3,0,0.0,partial_body,false_negative,high,Person arm/sleeve visible at bottom-right edge. Extremely cropped. No detection — likely too little body visible. Possible FN.
+90,3000.0,0,0.0,empty_scene,none,none,Empty corridor. No person visible. True negative. Camera panning with motion blur.
+120,4000.0,0,0.0,back_view,false_negative,medium,Person walking away partially visible at right edge with motion blur. Not detected. Possible FN due to blur + partial silhouette.
+150,5000.0,1,0.8745,side_view,low_confidence,low,Black shirt walking sideways holding phone. BBox correct. Lower confidence (0.875) vs earlier frames. Partial body (legs cut).
+155,5166.7,2,0.9271,near_person,false_positive,medium,1 TP (black shirt conf 0.927). 1 suspected FP (potted plant on left detected as person conf ~0.491). FP to investigate.
+180,6000.0,1,0.9424,back_view,none,none,Black shirt walking away near camera. BBox correct. Partial body (legs cut). Slight motion blur. Good detection.
+196,6533.3,2,0.9351,partial_body,low_confidence,low,1 TP (black shirt conf 0.935). 1 marginal detection (green shirt at far left edge conf ~0.319). Second detect is borderline.
+210,7000.0,1,0.9546,side_view,none,none,Black shirt sideways near camera. BBox correct. High confidence. Slight motion blur. Partial body (legs cut).
+240,8000.0,1,0.9466,normal,none,none,Black shirt facing camera close up. Clear detection. High confidence. No blur. Partial body.
+258,8600.0,2,0.9074,normal,none,none,2 TPs: black shirt sideways close (conf 0.907) + green shirt walking away full body (conf 0.902). Both bboxes good.
