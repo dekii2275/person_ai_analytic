@@ -33,6 +33,7 @@ class TestManagerConfig:
         config = TrackAttributeManagerConfig()
         assert config.max_missed_frames >= 1
         assert config.removed_ttl_ms >= 0.0
+        assert config.max_trajectory_points >= 1
 
     @pytest.mark.parametrize("value", [0, -1, 1.5, True])
     def test_rejects_invalid_max_missed_frames(self, value):
@@ -51,6 +52,11 @@ class TestManagerConfig:
         config = TrackAttributeManagerConfig()
         with pytest.raises(FrozenInstanceError):
             config.max_missed_frames = 10
+
+    @pytest.mark.parametrize("value", [0, -1, 1.5, True])
+    def test_rejects_invalid_max_trajectory_points(self, value):
+        with pytest.raises((TypeError, ValueError)):
+            TrackAttributeManagerConfig(max_trajectory_points=value)
 
 
 class TestCreateUpdateAndQuery:
@@ -183,6 +189,134 @@ class TestLifecycleTransitions:
 
         with pytest.raises(ValueError, match="removed"):
             manager.update([_track()], 3, 100.0)
+
+
+class TestBoundedTrajectory:
+    def test_new_track_stores_bottom_center_point(self):
+        manager = TrackAttributeManager()
+        track = Track(
+            track_id=4,
+            x1=10.0,
+            y1=20.0,
+            x2=70.0,
+            y2=180.0,
+            score=0.9,
+            class_id=0,
+        )
+        profile = manager.update([track], 5, 166.7)[0]
+
+        assert len(profile.trajectory) == 1
+        point = profile.trajectory[0]
+        assert point.frame_index == 5
+        assert point.timestamp_ms == 166.7
+        assert point.x == pytest.approx(40.0)
+        assert point.y == pytest.approx(180.0)
+
+    def test_observed_frames_append_real_points(self):
+        manager = TrackAttributeManager()
+        manager.update([_track(x1=10.0)], 0, 0.0)
+        manager.update([_track(x1=20.0)], 1, 33.3)
+        profile = manager.update([_track(x1=30.0)], 2, 66.7)[0]
+
+        assert [point.frame_index for point in profile.trajectory] == [0, 1, 2]
+        assert [point.timestamp_ms for point in profile.trajectory] == [
+            0.0,
+            33.3,
+            66.7,
+        ]
+        assert [point.x for point in profile.trajectory] == [
+            35.0,
+            45.0,
+            55.0,
+        ]
+
+    def test_missing_frames_do_not_add_synthetic_points(self):
+        manager = TrackAttributeManager()
+        manager.update([_track()], 0, 0.0)
+        profile = manager.update([], 1, 33.3)[0]
+
+        assert profile.lifecycle is TrackLifecycle.LOST
+        assert len(profile.trajectory) == 1
+        assert profile.trajectory[0].frame_index == 0
+
+    def test_reactivated_track_appends_new_observation(self):
+        manager = TrackAttributeManager()
+        manager.update([_track(x1=10.0)], 0, 0.0)
+        manager.update([], 1, 33.3)
+        profile = manager.update([_track(x1=30.0)], 2, 66.7)[0]
+
+        assert profile.lifecycle is TrackLifecycle.ACTIVE
+        assert [point.frame_index for point in profile.trajectory] == [0, 2]
+        assert profile.observed_frames == 2
+        assert profile.age_frames == 3
+        assert profile.missed_frames == 0
+
+    def test_trajectory_keeps_only_most_recent_configured_points(self):
+        manager = TrackAttributeManager(
+            TrackAttributeManagerConfig(max_trajectory_points=3)
+        )
+        for frame_index in range(1_000):
+            manager.update(
+                [_track(x1=float(frame_index))],
+                frame_index,
+                frame_index * 10.0,
+            )
+
+        profile = manager.get_profile(1)
+        assert len(profile.trajectory) == 3
+        assert [point.frame_index for point in profile.trajectory] == [
+            997,
+            998,
+            999,
+        ]
+        assert profile.first_seen_frame_index == 0
+        assert profile.last_seen_frame_index == 999
+        assert profile.age_frames == 1_000
+        assert profile.observed_frames == 1_000
+
+    def test_trajectory_limit_is_applied_per_track(self):
+        manager = TrackAttributeManager(
+            TrackAttributeManagerConfig(max_trajectory_points=2)
+        )
+        for frame_index in range(4):
+            manager.update(
+                [_track(1, x1=float(frame_index)), _track(2, x1=100.0)],
+                frame_index,
+                frame_index * 10.0,
+            )
+
+        assert len(manager.get_profile(1).trajectory) == 2
+        assert len(manager.get_profile(2).trajectory) == 2
+
+    def test_profile_snapshot_is_detached_from_future_updates(self):
+        manager = TrackAttributeManager()
+        old_profile = manager.update([_track()], 0, 0.0)[0]
+        manager.update([_track()], 1, 33.3)
+
+        assert len(old_profile.trajectory) == 1
+        assert len(manager.get_profile(1).trajectory) == 2
+
+    def test_reset_discards_trajectory(self):
+        manager = TrackAttributeManager()
+        manager.update([_track()], 0, 0.0)
+        manager.reset()
+        profile = manager.update([_track()], 0, 0.0)[0]
+
+        assert len(profile.trajectory) == 1
+        assert profile.observed_frames == 1
+
+    def test_invalid_coordinate_does_not_partially_mutate_manager(self):
+        manager = TrackAttributeManager()
+        manager.update([_track(1)], 0, 0.0)
+        bad_track = _track(2, x1=float("nan"))
+
+        with pytest.raises(ValueError):
+            manager.update([bad_track], 1, 33.3)
+
+        assert manager.get_profile(2) is None
+        assert manager.get_profile(1).lifecycle is TrackLifecycle.ACTIVE
+        assert manager.last_frame_index == 0
+        assert manager.last_timestamp_ms == 0.0
 
 
 class TestTtlCleanup:

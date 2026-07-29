@@ -8,12 +8,17 @@ perform tracking, or persist data.  Public results are immutable
 from __future__ import annotations
 
 import math
+from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Deque, Dict, List, Optional, Tuple
 
 from src.schemas import Track
-from src.track_attributes.schemas import TrackLifecycle, TrackProfile
+from src.track_attributes.schemas import (
+    TrackLifecycle,
+    TrackProfile,
+    TrajectoryPoint,
+)
 
 
 def _require_int(value: object, name: str, *, minimum: int) -> None:
@@ -39,11 +44,13 @@ class TrackAttributeManagerConfig:
     A track becomes ``lost`` on its first missing frame.  It becomes
     ``removed`` once consecutive missing frames exceed
     ``max_missed_frames``.  Removed state is retained for
-    ``removed_ttl_ms`` before cleanup.
+    ``removed_ttl_ms`` before cleanup.  Each track retains only its most
+    recent ``max_trajectory_points`` bottom-center observations.
     """
 
     max_missed_frames: int = 30
     removed_ttl_ms: float = 5_000.0
+    max_trajectory_points: int = 120
 
     def __post_init__(self) -> None:
         _require_int(
@@ -54,6 +61,11 @@ class TrackAttributeManagerConfig:
         _require_timestamp(
             self.removed_ttl_ms,
             "TrackAttributeManagerConfig.removed_ttl_ms",
+        )
+        _require_int(
+            self.max_trajectory_points,
+            "TrackAttributeManagerConfig.max_trajectory_points",
+            minimum=1,
         )
 
 
@@ -70,17 +82,20 @@ class _TrackState:
     age_frames: int
     observed_frames: int
     missed_frames: int
+    trajectory: Deque[TrajectoryPoint]
     removed_at_ms: Optional[float] = None
 
     @classmethod
     def create(
         cls,
-        track_id: int,
+        track: Track,
+        point: TrajectoryPoint,
         frame_index: int,
         timestamp_ms: float,
+        max_trajectory_points: int,
     ) -> "_TrackState":
         return cls(
-            track_id=track_id,
+            track_id=track.track_id,
             lifecycle=TrackLifecycle.ACTIVE,
             first_seen_frame_index=frame_index,
             last_seen_frame_index=frame_index,
@@ -89,9 +104,18 @@ class _TrackState:
             age_frames=1,
             observed_frames=1,
             missed_frames=0,
+            trajectory=deque(
+                (point,),
+                maxlen=max_trajectory_points,
+            ),
         )
 
-    def observe(self, frame_index: int, timestamp_ms: float) -> None:
+    def observe(
+        self,
+        point: TrajectoryPoint,
+        frame_index: int,
+        timestamp_ms: float,
+    ) -> None:
         self.lifecycle = TrackLifecycle.ACTIVE
         self.last_seen_frame_index = frame_index
         self.last_seen_ms = timestamp_ms
@@ -99,6 +123,7 @@ class _TrackState:
         self.observed_frames += 1
         self.missed_frames = 0
         self.removed_at_ms = None
+        self.trajectory.append(point)
 
     def mark_missing(
         self,
@@ -125,6 +150,7 @@ class _TrackState:
             age_frames=self.age_frames,
             observed_frames=self.observed_frames,
             missed_frames=self.missed_frames,
+            trajectory=tuple(self.trajectory),
         )
 
 
@@ -168,12 +194,12 @@ class TrackAttributeManager:
         must increase strictly; presentation timestamps may stay equal but
         must never decrease.
         """
-        track_items = self._validate_update_input(
+        observations = self._validate_update_input(
             tracks,
             frame_index,
             timestamp_ms,
         )
-        seen_ids = {track.track_id for track in track_items}
+        seen_ids = {track.track_id for track, _point in observations}
         expired_ids = set(self._expired_ids(timestamp_ms))
 
         for track_id in seen_ids:
@@ -202,16 +228,18 @@ class TrackAttributeManager:
                     self._config.max_missed_frames,
                 )
 
-        for track in track_items:
+        for track, point in observations:
             state = self._states.get(track.track_id)
             if state is None:
                 self._states[track.track_id] = _TrackState.create(
-                    track.track_id,
+                    track,
+                    point,
                     frame_index,
                     timestamp_ms,
+                    self._config.max_trajectory_points,
                 )
             else:
-                state.observe(frame_index, timestamp_ms)
+                state.observe(point, frame_index, timestamp_ms)
 
         self._last_frame_index = frame_index
         self._last_timestamp_ms = timestamp_ms
@@ -272,7 +300,7 @@ class TrackAttributeManager:
         tracks: Sequence[Track],
         frame_index: int,
         timestamp_ms: float,
-    ) -> tuple[Track, ...]:
+    ) -> Tuple[Tuple[Track, TrajectoryPoint], ...]:
         _require_int(frame_index, "frame_index", minimum=0)
         _require_timestamp(timestamp_ms, "timestamp_ms")
 
@@ -297,18 +325,31 @@ class TrackAttributeManager:
 
         track_items = tuple(tracks)
         seen_ids = set()
+        observations = []
         for track in track_items:
             if not isinstance(track, Track):
                 raise TypeError(
                     "tracks must contain only Track objects, "
                     f"got {type(track).__name__}"
                 )
+            _require_int(track.track_id, "Track.track_id", minimum=0)
             if track.track_id in seen_ids:
                 raise ValueError(
                     f"Duplicate track_id in frame: {track.track_id}"
                 )
             seen_ids.add(track.track_id)
-        return track_items
+            observations.append(
+                (
+                    track,
+                    TrajectoryPoint(
+                        frame_index=frame_index,
+                        timestamp_ms=timestamp_ms,
+                        x=(track.x1 + track.x2) / 2.0,
+                        y=track.y2,
+                    ),
+                )
+            )
+        return tuple(observations)
 
     def _expired_ids(self, timestamp_ms: float) -> List[int]:
         expired = []
@@ -341,7 +382,9 @@ class TrackAttributeManager:
             "TrackAttributeManager("
             f"states={len(self)}, "
             f"max_missed_frames={self._config.max_missed_frames}, "
-            f"removed_ttl_ms={self._config.removed_ttl_ms})"
+            f"removed_ttl_ms={self._config.removed_ttl_ms}, "
+            f"max_trajectory_points="
+            f"{self._config.max_trajectory_points})"
         )
 
 
