@@ -11,11 +11,12 @@ import math
 from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Deque, Dict, List, Optional, Tuple
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 from src.schemas import Track
 from src.track_attributes.schemas import (
     AttributeObservation,
+    StableAttribute,
     TrackLifecycle,
     TrackProfile,
     TrajectoryPoint,
@@ -23,6 +24,13 @@ from src.track_attributes.schemas import (
 
 _AttributeKey = Tuple[str, str]
 _InferenceStamp = Tuple[int, float]
+
+
+@dataclass
+class _VoteBucket:
+    value: Any
+    total_weight: float = 0.0
+    observation_count: int = 0
 
 
 def _require_int(value: object, name: str, *, minimum: int) -> None:
@@ -67,7 +75,8 @@ class TrackAttributeManagerConfig:
     ``removed_ttl_ms`` before cleanup.  Each track retains only its most
     recent ``max_trajectory_points`` bottom-center observations.  Attribute
     inference is gated by frame interval and crop quality, with a separate
-    bounded observation cache per namespace/key.
+    bounded observation cache per namespace/key.  Stable values use
+    confidence-weighted voting over the most recent configured window.
     """
 
     max_missed_frames: int = 30
@@ -76,6 +85,8 @@ class TrackAttributeManagerConfig:
     inference_interval_frames: int = 10
     min_inference_quality_score: float = 0.5
     max_observations_per_attribute: int = 30
+    voting_window_size: int = 5
+    min_voting_observations: int = 3
 
     def __post_init__(self) -> None:
         _require_int(
@@ -106,6 +117,28 @@ class TrackAttributeManagerConfig:
             "TrackAttributeManagerConfig.max_observations_per_attribute",
             minimum=1,
         )
+        _require_int(
+            self.voting_window_size,
+            "TrackAttributeManagerConfig.voting_window_size",
+            minimum=1,
+        )
+        _require_int(
+            self.min_voting_observations,
+            "TrackAttributeManagerConfig.min_voting_observations",
+            minimum=1,
+        )
+        if self.min_voting_observations > self.voting_window_size:
+            raise ValueError(
+                "min_voting_observations must be <= voting_window_size"
+            )
+        if (
+            self.min_voting_observations
+            > self.max_observations_per_attribute
+        ):
+            raise ValueError(
+                "min_voting_observations must be <= "
+                "max_observations_per_attribute"
+            )
 
 
 @dataclass
@@ -124,6 +157,7 @@ class _TrackState:
     trajectory: Deque[TrajectoryPoint]
     observations: Dict[_AttributeKey, Deque[AttributeObservation]]
     last_inference: Dict[_AttributeKey, _InferenceStamp]
+    stable_attributes: Dict[_AttributeKey, StableAttribute]
     removed_at_ms: Optional[float] = None
 
     @classmethod
@@ -151,6 +185,7 @@ class _TrackState:
             ),
             observations={},
             last_inference={},
+            stable_attributes={},
         )
 
     def observe(
@@ -183,6 +218,11 @@ class _TrackState:
             self.lifecycle = TrackLifecycle.LOST
 
     def to_profile(self) -> TrackProfile:
+        attributes: Dict[str, Dict[str, StableAttribute]] = {}
+        for (namespace, key), stable in sorted(
+            self.stable_attributes.items()
+        ):
+            attributes.setdefault(namespace, {})[key] = stable
         return TrackProfile(
             track_id=self.track_id,
             lifecycle=self.lifecycle,
@@ -194,6 +234,7 @@ class _TrackState:
             observed_frames=self.observed_frames,
             missed_frames=self.missed_frames,
             trajectory=tuple(self.trajectory),
+            attributes=attributes,
         )
 
 
@@ -419,6 +460,7 @@ class TrackAttributeManager:
             observation.frame_index,
             observation.timestamp_ms,
         )
+        self._refresh_stable_attribute(state, attribute_key)
 
     def get_observations(
         self,
@@ -441,6 +483,17 @@ class TrackAttributeManager:
         attribute_key = self._validate_attribute_key(namespace, key)
         state = self._get_state(track_id)
         return state.last_inference.get(attribute_key)
+
+    def get_stable_attribute(
+        self,
+        track_id: int,
+        namespace: str,
+        key: str,
+    ) -> Optional[StableAttribute]:
+        """Return the current temporally aggregated attribute, if stable."""
+        attribute_key = self._validate_attribute_key(namespace, key)
+        state = self._get_state(track_id)
+        return state.stable_attributes.get(attribute_key)
 
     def cleanup(self, timestamp_ms: float) -> List[int]:
         """Delete removed states whose retention TTL has elapsed.
@@ -546,6 +599,68 @@ class TrackAttributeManager:
             del self._states[track_id]
         return expired_ids
 
+    def _refresh_stable_attribute(
+        self,
+        state: _TrackState,
+        attribute_key: _AttributeKey,
+    ) -> None:
+        cached = state.observations[attribute_key]
+        window = tuple(cached)[-self._config.voting_window_size :]
+        if len(window) < self._config.min_voting_observations:
+            state.stable_attributes.pop(attribute_key, None)
+            return
+
+        buckets: Dict[Tuple[str, str], _VoteBucket] = {}
+        total_weight = 0.0
+        for observation in window:
+            canonical = self._canonical_attribute_value(
+                observation.value
+            )
+            bucket = buckets.get(canonical)
+            if bucket is None:
+                bucket = _VoteBucket(value=observation.value)
+                buckets[canonical] = bucket
+            bucket.total_weight += observation.score
+            bucket.observation_count += 1
+            total_weight += observation.score
+
+        _winner_key, winner = min(
+            buckets.items(),
+            key=lambda item: (
+                -item[1].total_weight,
+                -item[1].observation_count,
+                item[0],
+            ),
+        )
+        stable_score = (
+            winner.total_weight / total_weight
+            if total_weight > 0.0
+            else 0.0
+        )
+        stable_score = min(max(stable_score, 0.0), 1.0)
+        latest = window[-1]
+        state.stable_attributes[attribute_key] = StableAttribute(
+            value=winner.value,
+            score=stable_score,
+            observation_count=winner.observation_count,
+            last_updated_frame_index=latest.frame_index,
+            last_updated_ms=latest.timestamp_ms,
+        )
+
+    @staticmethod
+    def _canonical_attribute_value(value: Any) -> Tuple[str, str]:
+        if isinstance(value, bool):
+            return "bool", "true" if value else "false"
+        if isinstance(value, int):
+            return "int", str(value)
+        if isinstance(value, float):
+            return "float", value.hex()
+        if isinstance(value, str):
+            return "str", value
+        raise TypeError(
+            f"Unsupported attribute value type: {type(value).__name__}"
+        )
+
     @staticmethod
     def _validate_attribute_key(
         namespace: str,
@@ -604,7 +719,10 @@ class TrackAttributeManager:
             f"inference_interval_frames="
             f"{self._config.inference_interval_frames}, "
             f"max_observations_per_attribute="
-            f"{self._config.max_observations_per_attribute})"
+            f"{self._config.max_observations_per_attribute}, "
+            f"voting_window_size={self._config.voting_window_size}, "
+            f"min_voting_observations="
+            f"{self._config.min_voting_observations})"
         )
 
 
